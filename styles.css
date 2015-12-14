@@ -1,0 +1,103 @@
+html {
+	font-size: 62.5%;
+	font-family: Roboto;
+	margin: 0;
+}
+body {
+	margin: 0;
+}
+.unselect {
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+header {
+	width: 100%;
+	background-color: #43A047;
+	text-align: center;
+	padding-top: 2rem;
+	padding-bottom: 2rem;
+}
+header h1 {
+	font-size: 3rem;
+	margin: 0;
+	color: #FFF;
+}
+#searchbar {
+	margin: 3rem;
+}
+input[type="search"]::-webkit-input-placeholder {
+	color: #C8E6C9 !important;
+}
+input[type="search"]:-moz-placeholder {
+	color: #C8E6C9 !important;
+}
+input[type="search"]::-moz-placeholder {
+	color: #C8E6C9 !important;
+}
+input[type="search"]:-ms-input-placeholder {
+	color: #C8E6C9 !important;
+}
+input[type="search"]:focus {
+	outline: none;
+}
+#searchbar a {
+	text-decoration: none;
+	color: #fff;
+}
+#searchbar label:nth-of-type(2) a i {
+	vertical-align: middle;
+}
+/**
+* original idea for using radiobuttons by: 
+* http://codepen.io/eliasmeire/pen/JGjaov
+*/
+label {
+	font-size: 1.4rem;
+	margin: 1rem;
+	color: #FFF;
+}
+input[type="search"] {
+	font-family: Roboto;
+	font-size: 1.6rem;
+	padding-bottom: 0.7rem;
+	background-color: #43A047;
+	border: 0;
+	border-bottom: 2px #2E7D32 solid;
+	color: #FFF;
+}
+#modeselect label {
+	position: relative;
+	cursor: pointer;
+}
+input[type="radio"] {
+	display: none;
+}
+input[type="radio"] + span { 
+    display: inline-block;
+    height: 2.5rem;
+    width: 2.5rem;
+    padding: 1.25rem;
+    font-size: 1.5rem;
+    background-color: #2E7D32;
+   	border-radius: 50%;
+   	color: #C8E6C9;
+   	transition: background-color 0.4s;
+	-webkit-transition: background-color 0.4s;
+}
+#modeselect span {
+	
+}
+input[type="radio"]:checked + span {
+    background: #FFFFFF;
+    color: #000000;
+}
+
+@media(max-width: 33rem) {
+	#searchbar label {
+		display: block;
+	}
+}

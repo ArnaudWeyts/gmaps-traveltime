@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Gmaps Traveltime</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#2196F3">
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic,300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="styles.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+</head>
+<body>
+	<header>
+		<h1>Gmaps Traveltime</h1>
+		<section id="searchbar">
+			<label for="from"></label>
+			<input type="search" name="from" id="from" placeholder="Choose starting point"/>			
+			<label for="to"><a class="unselect" href=""><i class="material-icons">swap_horiz</i></a></label>
+			<input type="search" name="to" id="to" placeholder="Choose destination"/>
+		</section>
+		<section id="modeselect">
+			<label for="car">
+				<input type="radio" name="radios" id="car" checked />
+				<span class="unselect"><i class="material-icons">directions_car</i></i></span>
+			</label>
+			<label for="bicycle">
+				<input type="radio" name="radios" id="bicycle" />
+				<span class="unselect"><i class="material-icons">directions_bike</i></i></i></span>
+			</label>
+			<label for="walking">
+				<input type="radio" name="radios" id="walking" />
+				<span class="unselect"><i class="material-icons">directions_walk</i></span>
+			</label>
+		</section>
+	</header>
+</body>
+</html>
