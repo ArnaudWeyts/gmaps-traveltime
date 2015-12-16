@@ -7,12 +7,15 @@ body {
 	margin: 0;
 }
 .unselect {
-	-webkit-touch-callout: none;
+	webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+a.unselect {
+	
 }
 header {
 	width: 100%;
@@ -44,11 +47,16 @@ input[type="search"]:-ms-input-placeholder {
 input[type="search"]:focus {
 	outline: none;
 }
+input[type="submit"]:focus {
+	outline: none;
+	border: 1px solid #fff;
+}
 #searchbar a {
 	text-decoration: none;
 	color: #fff;
 }
 #searchbar label:nth-of-type(2) a i {
+	margin: 1rem;
 	vertical-align: middle;
 }
 /* Clear annoying "X" icon */
@@ -62,11 +70,7 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 * original idea for using radiobuttons by: 
 * http://codepen.io/eliasmeire/pen/JGjaov
 */
-label {
-	font-size: 1.4rem;
-	margin: 1rem;
-	color: #FFF;
-}
+
 input[type="search"] {
 	font-family: Roboto;
 	font-size: 1.6rem;
@@ -80,10 +84,15 @@ input[type="search"] {
 	position: relative;
 	cursor: pointer;
 }
-input[type="radio"] {
-	display: none;
+#modeselect span {
+	margin: 0 1rem;
 }
-input[type="radio"] + span { 
+input[type="radio"] {
+	opacity: 0;
+	margin: 0;
+	width: 0;
+}
+input[type="radio"] + span {
     display: inline-block;
     height: 2.5rem;
     width: 2.5rem;
@@ -95,16 +104,28 @@ input[type="radio"] + span {
    	transition: background-color 0.4s;
 	-webkit-transition: background-color 0.4s;
 }
-#modeselect span {
-	
-}
 input[type="radio"]:checked + span {
     background: #FFFFFF;
     color: #000000;
+}
+input[type="submit"] {
+	cursor: pointer;
+	color: #fff;
+	background-color: #2E7D32;
+	margin-top: 2rem;
+	width: 12rem;
+	height: 3.2rem;
+	border: 1px solid #2E7D32;
+	border-radius: 2px;
+	font-size: 1.6rem;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
 
 @media(max-width: 33rem) {
 	#searchbar label {
 		display: block;
+	}
+	#switchIcon {
+		transform: rotate(-90deg);
 	}
 }
