@@ -121,6 +121,10 @@ input[type="submit"] {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
 
+#map {
+	height: 60%;
+}
+
 @media(max-width: 33rem) {
 	#searchbar label {
 		display: block;
