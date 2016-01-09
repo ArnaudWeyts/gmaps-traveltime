@@ -24,15 +24,17 @@ if(typeof(Storage) !== "undefined") {
 			$('#walking').prop('checked', true);
 		}
 	}
+	//if we already did a search, the search button will
+	//be an edit button and everything will be disabled
+	if (localStorage.calculated === 'true') {
+	   	$submitbutton.val('Edit');
+	   	$start.prop('disabled', true);
+	   	$destination.prop('disabled', true);
+	   	$('input[name="radios"]').prop('disabled', true);
+	}
 	else {
 		$('#car').prop('checked', true);
 	}
-   	//if there's something in localstorage, the search button will
-   	//be an edit button and everything will be disabled
-   	$submitbutton.val('Edit');
-   	$start.prop('disabled', true);
-   	$destination.prop('disabled', true);
-   	$('input[name="radios"]').prop('disabled', true);
    }
    else {
    	console.log("No localstorage supported");
@@ -52,6 +54,7 @@ $submitbutton.click(function(e) {
 		$start.prop('disabled', true);
 		$destination.prop('disabled', true);
 		$('input[name="radios"]').prop('disabled', true);
+		localStorage.calculated = 'true';
 	}
 	else {
 		$('#dialog-confirm').dialog({
