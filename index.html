@@ -9,11 +9,15 @@
 	<link rel="stylesheet" href="styles.css">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
 	rel="stylesheet">
+	<link rel="stylesheet" href="jquery/jquery-ui.min.css">
 </head>
 <body>
+	<div id="dialog-confirm" title="Are you sure you want to edit?" style="display: none">
+    	<p>All of your traveltimes &amp; results will be deleted</p>
+	</div>
 	<header>
 		<h1>Gmaps Traveltime</h1>
-		<form method="POST">
+		<form>
 			<section id="searchbar">
 				<label for="from"></label>
 				<input type="search" name="from" id="from" placeholder="Choose starting point"/>
@@ -22,7 +26,7 @@
 			</section>
 			<section id="modeselect">
 				<label for="car">
-					<input type="radio" name="radios" id="car" checked />
+					<input type="radio" name="radios" id="car" />
 					<span class="unselect"><i class="material-icons">directions_car</i></i></span>
 				</label>
 				<label for="bicycle">
@@ -38,5 +42,14 @@
 			<input type="submit" value="Search">
 		</form>
 	</header>
+	<div id="content">
+		<section>
+			
+		</section>
+	</div>
+	<script src="jquery/jquery-2.2.0.min.js"></script>
+	<script src="jquery/jquery-ui.min.js"></script>
+	<script src="script.js"></script>
+	<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDW9Fdp-9aH2IYuhIOsQBG4BR9gLpLa_oM"></script>
 </body>
 </html>
