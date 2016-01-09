@@ -24,21 +24,21 @@ if(typeof(Storage) !== "undefined") {
 			$('#walking').prop('checked', true);
 		}
 	}
-	//if we already did a search, the search button will
-	//be an edit button and everything will be disabled
-	if (localStorage.calculated === 'true') {
-	   	$submitbutton.val('Edit');
-	   	$start.prop('disabled', true);
-	   	$destination.prop('disabled', true);
-	   	$('input[name="radios"]').prop('disabled', true);
-	}
 	else {
 		$('#car').prop('checked', true);
 	}
-   }
-   else {
-   	console.log("No localstorage supported");
-   }
+	//if we already did a search, the search button will
+	//be an edit button and everything will be disabled
+	if (localStorage.calculated === 'true') {
+		$submitbutton.val('Edit');
+		$start.prop('disabled', true);
+		$destination.prop('disabled', true);
+		$('input[name="radios"]').prop('disabled', true);
+	}
+}
+else {
+	console.log("No localstorage supported");
+}
 
 //remember the values & selected modes when the form is
 //submitted
