@@ -43,7 +43,6 @@ else {
 //remember the values & selected modes when the form is
 //submitted
 $submitbutton.click(function(e) {
-	e.preventDefault();
 	//check if editing, or searching
 	if ($submitbutton.val() === "Search") {
 		localStorage.start = $start.val();
@@ -159,4 +158,12 @@ function calculateRoute() {
 			directionsDisplay.setDirections(result);
 		}
 	});
+	xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+			$('#distancematrix').html(xhr.responseText);
+		}
+	};
+	xhr.open('GET', 'distancematrix.php', true);
+	xhr.send();
 }
