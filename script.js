@@ -43,6 +43,7 @@ else {
 //remember the values & selected modes when the form is
 //submitted
 $submitbutton.click(function(e) {
+	e.preventDefault();
 	//check if editing, or searching
 	if ($submitbutton.val() === "Search") {
 		localStorage.start = $start.val();
