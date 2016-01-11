@@ -81,6 +81,7 @@ input[type="search"] {
 	background-color: #43A047;
 	border: 0;
 	border-bottom: 2px #2E7D32 solid;
+	color: #FFF;
 }
 #modeselect label {
 	position: relative;
