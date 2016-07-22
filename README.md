@@ -1,2 +1,3 @@
-# gmaps-traveltime
-https://weyts.xyz/gmaps-traveltime
+# Google Maps Traveltime
+
+School project.
