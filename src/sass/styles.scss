@@ -53,6 +53,7 @@ header {
     }
 }
 input[type="search"] {
+    -webkit-appearance: none;
     &::-webkit-input-placeholder {
         color: #C8E6C9 !important;
     }

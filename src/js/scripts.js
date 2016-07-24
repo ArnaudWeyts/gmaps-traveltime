@@ -1,6 +1,3 @@
-var $ = require("jQuery");
-require("jquery-ui-browserify");
-
 //declare variables
 var $start = $('#from');
 var $destination = $('#to');
