@@ -67,13 +67,16 @@ gulp.task("browser-sync", () => {
 gulp.task("copy", function () {
     gulp.src(SRC + "/fonts/*")
     .pipe(gulp.dest(DEST + "/assets/fonts"))
+    gulp.src(SRC + "/index.html")
+    .pipe(gulp.dest(DEST));
 });
 
 gulp.task("watch", function () {
+    gulp.watch(SRC + "/index.html", ["copy"]).on("change", browserSync.reload);
     gulp.watch(SRC + "/sass/**/*.scss", ["sass"]).on("change", browserSync.reload);
     gulp.watch(SRC + "/js/**/*.js", ["scripts"]).on("change", browserSync.reload);
 });
 
-gulp.task("default", ["watch", "jade", "copy", "scripts", "sass", "browser-sync"]);
-gulp.task("compile", ["jade", "copy", "scripts", "sass", "images"]);
+gulp.task("default", ["watch", "copy", "scripts", "sass", "browser-sync"]);
+gulp.task("compile", ["copy", "scripts", "sass"]);
 

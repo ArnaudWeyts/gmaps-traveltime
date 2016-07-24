@@ -12,6 +12,9 @@ body {
     margin: 0;
     padding: 0;
 }
+.align-icon {
+    vertical-align: middle;
+}
 .unselect {
     webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -160,7 +163,8 @@ input[type="radio"] {
     height: 100%;
     width: 100%;
 }
-@media max-width: 33rem) {
+
+@media(max-width: 33rem) {
     #searchbar {
         label {
             display: block;

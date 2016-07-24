@@ -5,11 +5,8 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="theme-color" content="#2196F3">
-	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic,300' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="styles.css">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-	rel="stylesheet">
-	<link rel="stylesheet" href="jquery/jquery-ui.min.css">
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic,300' rel='stylesheet'>
+	<link rel="stylesheet" href="/assets/css/styles.min.css">
 </head>
 <body>
 	<div id="dialog-confirm" title="Are you sure you want to edit?" style="display: none">
@@ -27,15 +24,21 @@
 			<section id="modeselect">
 				<label for="car">
 					<input type="radio" name="radios" id="car" />
-					<span class="unselect"><i class="material-icons">directions_car</i></i></span>
+					<span class="unselect">
+						<i class="align-icon icon-automobile"></i>
+					</span>
 				</label>
 				<label for="bicycle">
 					<input type="radio" name="radios" id="bicycle" />
-					<span class="unselect"><i class="material-icons">directions_bike</i></i></i></span>
+					<span class="unselect">
+						<i class="align-icon icon-bike"></i>
+					</span>
 				</label>
 				<label for="walking">
 					<input type="radio" name="radios" id="walking" />
-					<span class="unselect"><i class="material-icons">directions_walk</i></span>
+					<span class="unselect">
+						<i class="align-icon icon-bus"></i>
+					</span>
 				</label>
 			</section>
 			<label for="submit"></label>
@@ -49,9 +52,7 @@
 		<section id='distancematrix'>
 		</section>
 	</div>
-	<script src="jquery/jquery-2.2.0.min.js"></script>
-	<script src="jquery/jquery-ui.min.js"></script>
-	<script src="script.js"></script>
+	<script src="/assets/js/main.min.js"></script>
 	<script
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDW9Fdp-9aH2IYuhIOsQBG4BR9gLpLa_oM&libraries=places&callback=initMap" async defer>
     </script>
