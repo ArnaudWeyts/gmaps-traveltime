@@ -7,7 +7,7 @@
 	<meta name="theme-color" content="#2196F3">
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic,300' rel='stylesheet'>
 	<link rel="stylesheet" href="/assets/css/styles.min.css">
-	<link rel="stylesheet" href="/assets/jquery-ui-theme-base/jquery.ui.all.css">
+	<link rel="stylesheet" href="/assets/jquery-ui/jquery-ui.min.css">
 </head>
 <body>
 	<div id="dialog-confirm" title="Are you sure you want to edit?" style="display: none">
@@ -19,18 +19,18 @@
 			<section id="searchbar">
 				<label for="from"></label>
 				<input type="search" name="from" id="from" placeholder="Choose starting point"/>
-				<label for="to"><a class="unselect" href=""><i id="switchIcon" class="icon-swap"></i></a></label>
+				<label for="to"><a class="unselect switchdest-button"><i id="switchIcon" class="icon-swap"></i></a></label>
 				<input type="search" name="to" id="to" placeholder="Choose destination"/>
 			</section>
 			<section id="modeselect">
-				<label for="car">
-					<input type="radio" name="radios" id="car" />
+				<label for="driving">
+					<input type="radio" name="radios" id="driving" />
 					<span class="unselect">
 						<i class="align-icon icon-car"></i>
 					</span>
 				</label>
-				<label for="bicycle">
-					<input type="radio" name="radios" id="bicycle" />
+				<label for="bicycling">
+					<input type="radio" name="radios" id="bicycling" />
 					<span class="unselect">
 						<i class="align-icon icon-bike"></i>
 					</span>
