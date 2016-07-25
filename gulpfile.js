@@ -70,9 +70,9 @@ gulp.task("copy", function () {
     gulp.src(SRC + "/index.html")
     .pipe(gulp.dest(DEST));
     gulp.src(SRC + "/distancematrix.php")
-    .pipe(gulp.dest(DEST + "/assets/"));
-    gulp.src(SRC + "/jquery-ui-theme-base/**/*")
-    .pipe(gulp.dest(DEST + "/assets/jquery-ui-theme-base"));
+    .pipe(gulp.dest(DEST + "/assets/"))
+    gulp.src(SRC + "/jquery-ui-1.12.0.custom/**/*")
+    .pipe(gulp.dest(DEST + "/assets/jquery-ui"))
 });
 
 gulp.task("watch", function () {
