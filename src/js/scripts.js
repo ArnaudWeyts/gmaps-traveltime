@@ -1,6 +1,8 @@
+require("chart.js");
+
 //declare variables
-var $start = $('#from');
-var $destination = $('#to');
+var $origin = $('#origin');
+var $destination = $('#destination');
 var $allmodes = $('input[name="radios"]');
 var $mode = $('input[name="radios"]:checked');
 var $switchbutton = $('.switchdest-button');
@@ -11,7 +13,7 @@ var $submitbutton = $('input[type="submit"]');
 if(typeof(Storage) !== "undefined") {
     // set destination and origin from localstorage
     if (localStorage.origin && localStorage.origin !== '') {
-        $start.val(localStorage.origin);
+        $origin.val(localStorage.origin);
     }
     if (localStorage.destination && localStorage.destination !== '') {
         $destination.val(localStorage.destination);
@@ -34,7 +36,7 @@ if(typeof(Storage) !== "undefined") {
     }
     // disable buttons if the route has been calculated
     if (localStorage.calculated === 'true') {
-        $start.prop('disabled', true);
+        $origin.prop('disabled', true);
         $destination.prop('disabled', true);
         $allmodes.prop('disabled', true);
         $submitbutton.val('Edit');
@@ -55,17 +57,17 @@ $submitbutton.click(function(e) {
     // calculating a route
     if ($submitbutton.val() === "Search") {
         // get input and set them in localstorage
-        localStorage.origin = $start.val();
+        localStorage.origin = $origin.val();
         localStorage.destination = $destination.val();
         $mode = $('input[name="radios"]:checked');
         localStorage.travelMode = $mode.prop('id');
         // disable inputs
         $submitbutton.val('Edit');
-        $start.prop('disabled', true);
+        $origin.prop('disabled', true);
         $destination.prop('disabled', true);
         $('input[name="radios"]').prop('disabled', true);
         // calculate the route & tell localstorage a route was calculated
-        calculateRoute($start.val(), $destination.val(), defineTravelMode($mode.prop('id')));
+        calculateRoute($origin.val(), $destination.val(), defineTravelMode($mode.prop('id')));
         localStorage.calculated = 'true';
     }
     // show dialog to confirm changes
@@ -79,9 +81,10 @@ $submitbutton.click(function(e) {
                 "Delete all items": function() {
                     $(this).dialog( "close" );
                     $submitbutton.val('Search');
-                    $start.prop('disabled', false);
+                    $origin.prop('disabled', false);
                     $destination.prop('disabled', false);
                     $('input[name="radios"]').prop('disabled', false);
+                    localStorage.clear();
                 },
                 Cancel: function() {
                     $(this).dialog( "close" );
@@ -98,10 +101,10 @@ $submitbutton.click(function(e) {
 $switchbutton.click(function(e) {
     e.preventDefault();
     if ($submitbutton.val() === "Search") {
-        $startvalue = $start.val();
+        $originvalue = $origin.val();
         $destvalue = $destination.val();
-        $start.val($destvalue);
-        $destination.val($startvalue);
+        $origin.val($destvalue);
+        $destination.val($originvalue);
     }
 })
 
@@ -109,8 +112,8 @@ $switchbutton.click(function(e) {
 -                    GOOGLE MAPS                     -
 ----------------------------------------------------*/
 
-var directionsService;
 var directionsDisplay;
+var directionsService;
 var map;
 
 /*
@@ -133,7 +136,7 @@ window.initMap = function() {
     trafficLayer.setMap(map);
 
     // Try HTML5 geolocation.
-    if (navigator.geolocation) {
+    if (navigator.geolocation && localStorage.calculated !== true) {
         navigator.geolocation.getCurrentPosition(function(position) {
             var pos = {
                 lat: position.coords.latitude,
@@ -151,8 +154,8 @@ window.initMap = function() {
     }
 
     // inputs
-    var origin_input = document.getElementById('from');
-    var destination_input = document.getElementById('to');
+    var origin_input = document.getElementById('origin');
+    var destination_input = document.getElementById('destination');
     var modes = document.getElementById('mode-select');
 
 
@@ -176,10 +179,13 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
         'Error: Your browser doesn\'t support geolocation.');
 }
 
-// calculate function
+/*
+    Calculates the route between 2 destinations using
+    the google distancematrix api
+*/
 function calculateRoute(origin, destination, travelMode) {
     /*var request = {
-        origin: $start.val(),
+        origin: $origin.val(),
         destination: $destination.val(),
         travelMode: google.maps.TravelMode.DRIVING
     };
@@ -196,6 +202,20 @@ function calculateRoute(origin, destination, travelMode) {
     };
     xhr.open('GET', '/assets/distancematrix.php', true);
     xhr.send();*/
+
+    // the request for the directions
+    var request = {
+        origin:origin,
+        destination:destination,
+        travelMode: travelMode
+    };
+
+    // use the returned results to set the route
+    directionsService.route(request, function(result, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+          directionsDisplay.setDirections(result);
+        }
+    });
 
     var service = new google.maps.DistanceMatrixService();
     service.getDistanceMatrix(
@@ -219,7 +239,8 @@ function calculateRoute(origin, destination, travelMode) {
                     var element = results[j];
                     var distance = element.distance.text;
                     var duration = element.duration.text;
-                    console.log(duration);
+                    $('#estimate').text(duration);
+                    $('.estimate').css('display', 'inline-block');
                     var from = origins[i];
                     var to = destinations[j];
                 }

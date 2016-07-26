@@ -153,16 +153,35 @@ input[type="radio"] {
         }
     }
 }
-#content {
+.content {
     height: 100%;
     width: 100%;
-    section {
-        height: 40%;
-    }
 }
-#map {
-    height: 100%;
+.map {
+    height: 27.5rem;
     width: 100%;
+}
+
+.center-block {
+    text-align: center;
+}
+
+.hide {
+    display: none;
+}
+
+.estimate {
+    display: none;
+    padding: 1rem 1rem;
+    font-size: 1.5rem;
+    color: #FFF;
+    background-color: #43A047;
+    border-radius: 2px;
+}
+
+.graphtitle {
+    font-size: 2.5rem;
+    margin-left: 1rem;
 }
 
 @media(max-width: 33rem) {
@@ -171,7 +190,7 @@ input[type="radio"] {
             display: block;
         }
     }
-    #switchIcon {
+    .icon-swap {
         transform: rotate(-90deg);
     }
 }

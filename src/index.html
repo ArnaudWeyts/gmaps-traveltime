@@ -17,10 +17,10 @@
 		<h1>Gmaps Traveltime</h1>
 		<form>
 			<section id="searchbar">
-				<label for="from"></label>
-				<input type="search" name="from" id="from" placeholder="Choose starting point"/>
-				<label for="to"><a class="unselect switchdest-button"><i id="switchIcon" class="icon-swap"></i></a></label>
-				<input type="search" name="to" id="to" placeholder="Choose destination"/>
+				<label for="origin"></label>
+				<input type="search" name="origin" id="origin" placeholder="Choose origin"/>
+				<label for="destination"><a class="unselect switchdest-button"><i id="switchIcon" class="icon-swap"></i></a></label>
+				<input type="search" name="destination" id="destination" placeholder="Choose destination"/>
 			</section>
 			<section id="modeselect">
 				<label for="driving">
@@ -47,10 +47,22 @@
 		</form>
 	</header>
 	<div id="content">
+		<div>
+			<div class="map" id="map"></div>
+			<div class="center-block">
+				<p class="estimate">Google's estimate: <span id="estimate"></span></p>
+			</div>
+			<div class="center-block hide">
+				<label for="days"></label>
+				<input type="number" name="days" min="0" placeholder="days">
+				<label for="hours"></label>
+				<input type="number" name="hours" min="0" max="24" placeholder="hours">
+				<label for="minutes"></label>
+				<input type="number" name="minutes" min="0" max="60">
+			</div>
+		</div>
 		<section>
-			<div id="map"></div>
-		</section>
-		<section id='distancematrix'>
+			<h2 class="graphtitle">Graph</h2>
 		</section>
 	</div>
 	<script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
