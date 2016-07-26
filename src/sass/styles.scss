@@ -52,7 +52,7 @@ header {
         }
     }
 }
-input[type="search"] {
+input[type="search"], input[type="number"] {
     -webkit-appearance: none;
     &::-webkit-input-placeholder {
         color: #C8E6C9 !important;
@@ -97,7 +97,6 @@ input[type="submit"] {
     cursor: pointer;
     color: #fff;
     background-color: #2E7D32;
-    margin-top: 2rem;
     width: 12rem;
     height: 3.2rem;
     border: 1px solid #2E7D32;
@@ -105,7 +104,13 @@ input[type="submit"] {
     font-size: 1.6rem;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
-input[type=text] {
+.search-btn {
+    margin-top: 2rem;
+}
+.addtime-btn {
+    margin-left: 1rem;
+}
+input[type="text"], input[type="number"] {
     &::-ms-clear {
         display: none;
         width: 0;
@@ -153,6 +158,11 @@ input[type="radio"] {
         }
     }
 }
+
+.material-input_number {
+    width: 10rem;
+    margin-left: 2rem;
+}
 .content {
     height: 100%;
     width: 100%;
@@ -162,12 +172,24 @@ input[type="radio"] {
     width: 100%;
 }
 
-.center-block {
+.center-text {
     text-align: center;
 }
 
 .hide {
     display: none;
+}
+
+.duration-input {
+    background-color: #43A047;
+    padding: 1rem;
+    border-radius: 2px;
+
+    p {
+        display: inline-block;
+        color: #FFF;
+        font-size: 1.5rem;
+    }
 }
 
 .estimate {

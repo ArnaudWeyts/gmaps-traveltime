@@ -1,4 +1,5 @@
-require("chart.js");
+var Chart = require("chart.js");
+//var graph = new Chart
 
 //declare variables
 var $origin = $('#origin');
@@ -6,7 +7,8 @@ var $destination = $('#destination');
 var $allmodes = $('input[name="radios"]');
 var $mode = $('input[name="radios"]:checked');
 var $switchbutton = $('.switchdest-button');
-var $submitbutton = $('input[type="submit"]');
+var $submitbutton = $('#search');
+var $addtimeButton = $('#addtime');
 
 // check if there's something in localstorage, and if so,
 // fill in the values or select the right mode
@@ -106,6 +108,14 @@ $switchbutton.click(function(e) {
         $origin.val($destvalue);
         $destination.val($originvalue);
     }
+});
+
+/*
+    Adds their own traveltime to the graph
+*/
+$addtimeButton.click(function(e) {
+    e.preventDefault();
+    
 })
 
 /*----------------------------------------------------
@@ -135,24 +145,6 @@ window.initMap = function() {
     var trafficLayer = new google.maps.TrafficLayer();
     trafficLayer.setMap(map);
 
-    // Try HTML5 geolocation.
-    if (navigator.geolocation && localStorage.calculated !== true) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-
-            map.setCenter(pos);
-        }, function() {
-            handleLocationError(true, infoWindow, map.getCenter());
-        });
-    }
-    else {
-        // Browser doesn't support Geolocation
-        handleLocationError(false, infoWindow, map.getCenter());
-    }
-
     // inputs
     var origin_input = document.getElementById('origin');
     var destination_input = document.getElementById('destination');
@@ -169,6 +161,25 @@ window.initMap = function() {
     // check if route was already calculated and recalculate
     if (localStorage.calculated === 'true') {
         calculateRoute(localStorage.origin, localStorage.destination, defineTravelMode(localStorage.travelMode));
+    }
+    // try HTML5 geolocation if the route wasn't calculated
+    else {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                map.setCenter(pos);
+            }, function() {
+                handleLocationError(true, infoWindow, map.getCenter());
+            });
+        }
+        else {
+            // Browser doesn't support Geolocation
+            handleLocationError(false, infoWindow, map.getCenter());
+        }
     }
 }
 
@@ -241,6 +252,7 @@ function calculateRoute(origin, destination, travelMode) {
                     var duration = element.duration.text;
                     $('#estimate').text(duration);
                     $('.estimate').css('display', 'inline-block');
+                    $('.duration-input').css('display', 'inline-block');
                     var from = origins[i];
                     var to = destinations[j];
                 }
