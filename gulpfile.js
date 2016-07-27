@@ -12,6 +12,7 @@ autoprefixer = require("gulp-autoprefixer"),
 //purify = require("gulp-purifycss"),
 cssnano = require("gulp-cssnano"),
 uglify = require("gulp-uglify"),
+eslint = require('gulp-eslint'),
 browserSync = require("browser-sync").create();
 
 var SRC = "./src";
@@ -33,11 +34,17 @@ gulp.task("sass", function () {
     .pipe(browserSync.stream())
 });
 
+gulp.task('eslint', function () {
+    return gulp.src(SRC + "/js/scripts/.js")
+    .pipe(eslint())
+    .pipe(eslint.format());
+});
+
 gulp.task("scripts", function() {
     // set up the browserify instance on a task basis
     var b = browserify({
         entries: SRC + "/js/scripts.js",
-        debug: true
+        debug: false
     });
 
     return b.bundle()
@@ -81,6 +88,6 @@ gulp.task("watch", function () {
     gulp.watch(SRC + "/js/**/*.js", ["scripts"]).on("change", browserSync.reload);
 });
 
-gulp.task("default", ["watch", "copy", "scripts", "sass", "browser-sync"]);
-gulp.task("compile", ["copy", "scripts", "sass"]);
+gulp.task("default", ["watch", "copy", "eslint", "scripts", "sass", "browser-sync"]);
+gulp.task("compile", ["copy", "eslint", "scripts", "sass"]);
 
