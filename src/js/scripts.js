@@ -15,18 +15,7 @@ var storageS,
     storageModule = {
 
     settings: {
-        // inputs and buttons
-        originInput: $('origin'),
-        destinationInput: $('destination'),
-        allModes: $('input[name="radios"]'),
-        selectedMode: $('input[name="radios"]:checked'),
-        switchButton: $('.switchdest-button'),
-        submitButton: $('#search'),
-        addtimeButton: $('#addtime'),
-        // actual variables
-        origin: $('origin').val(),
-        destination: $('destination').val(),
-        travelMode: $('input[name="radios"]:checked').prop('id')
+
     },
 
     init: function() {
@@ -40,9 +29,9 @@ var storageS,
     */
     setTravelData: function() {
         var travelData = {
-            origin: this.origin.val,
-            destination: this.destination.val,
-            mode: this.travelMode
+            origin: mapS.origin,
+            destination: mapS.destination,
+            mode: mapS.travelMode
         };
 
         localStorage.setItem('travelData', JSON.stringify(travelData));
@@ -58,16 +47,16 @@ var storageS,
 
             // get data from localstorage
             var travelData = JSON.parse(localStorage.getItem('travelData'));
-            this.origin = travelData.origin;
-            this.destination = travelData.destination;
-            this.travelMode = travelData.mode;
+            mapS.origin = travelData.origin;
+            mapS.destination = travelData.destination;
+            mapS.travelMode = travelData.mode;
 
             // set modes if localstorage has one defined
-            if (this.travelMode) {
-                if (this.travelMode === 'driving') {
+            if (mapS.travelMode) {
+                if (mapS.travelMode === 'driving') {
                     $('#driving').prop('checked', true);
                 }
-                else if (this.travelMode === 'bicycling') {
+                else if (mapS.travelMode === 'bicycling') {
                     $('#bicycling').prop('checked', true);
                 }
                 else {
@@ -80,11 +69,11 @@ var storageS,
             }
             // disable buttons if the route has been calculated
             if (localStorage.getItem('calculated') === 'true') {
-                this.originInput.prop('disabled', true);
-                this.destinationInput.prop('disabled', true);
-                this.allModes.prop('disabled', true);
-                this.submitButton.val('Edit');
-                this.switchButton.prop('disabled', true);
+                mapS.originInput.prop('disabled', true);
+                mapS.destinationInput.prop('disabled', true);
+                mapS.allModes.prop('disabled', true);
+                actionS.submitButton.val('Edit');
+                actionS.switchButton.prop('disabled', true);
             }
         }
         else {
@@ -97,8 +86,8 @@ var actionS,
     actionModule = {
 
     settings: {
-        originInput: $('origin'),
-        destinationInput: $('destination'),
+        originInput: $('#origin'),
+        destinationInput: $('#destination'),
         allModes: $('input[name="radios"]'),
         submitButton: $('#search'),
         addtimeButton: $('#addtime'),
@@ -107,21 +96,21 @@ var actionS,
 
     init: function() {
         actionS = this.settings;
-        this.bundUIActions();
+        this.bindUIActions();
     },
 
     /*
     *   Enables or disables all of the inputs
     */
     toggleInputs: function(disable) {
-        this.originInput.prop('disabled', disable);
-        this.destinationInput.prop('disabled', disable);
-        this.allModes.prop('disabled', disable);
+        mapS.originInput.prop('disabled', disable);
+        mapS.destinationInput.prop('disabled', disable);
+        mapS.allModes.prop('disabled', disable);
         if (disable) {
-            this.submitButton.val('Edit');
+            actionS.submitButton.val('Edit');
         }
         else {
-            this.submitButton.val('Search');
+            actionS.submitButton.val('Search');
         }
     },
 
@@ -134,10 +123,10 @@ var actionS,
             or shows the dialog to edit the inputs if a route was
             already calculated
         */
-        this.submitButton.click(function(e) {
+        actionS.submitButton.click(function(e) {
             e.preventDefault();
             // calculating a route
-            if (this.submitButton.val() === "Search") {
+            if (actionS.submitButton.val() === "Search") {
                 // get input and set them in localstorage
                 storageModule.setTravelData();
 
@@ -145,7 +134,7 @@ var actionS,
                 this.toggleInputs(true);
 
                 // calculate the route & tell localstorage a route was calculated
-                calculateRoute($origin.val(), $destination.val(), defineTravelMode($mode.prop('id')));
+                this.calculateRoute(mapS.origin, mapS.destination, this.defineTravelMode(mapS.travelMode));
             }
             // show dialog to confirm changes
             else {
@@ -174,13 +163,13 @@ var actionS,
         /*
         *   Switches destination and origin around
         */
-        this.switchButton.click(function(e) {
+        actionS.switchButton.click(function(e) {
             e.preventDefault();
-            if (this.submitButton.val() === "Search") {
-                var originvalue = this.originInput.val();
-                var destvalue = this.destinationInput.val();
-                this.originInput.val(destvalue);
-                this.destinationInput.val(originvalue);
+            if (actionS.submitButton.val() === "Search") {
+                var originvalue = mapS.$originInput.val();
+                var destvalue = mapS.$destinationInput.val();
+                mapS.$originInput.val(destvalue);
+                mapS.$destinationInput.val(originvalue);
             }
         });
     }
@@ -191,146 +180,159 @@ var actionS,
 -                    GOOGLE MAPS                     -
 ----------------------------------------------------*/
 
-var directionsDisplay;
-var directionsService;
-var map;
+var mapS,
+    mapModule = {
 
-/*
-    Initliazes the map
-*/
-window.initMap = function() {
-    // options
-    var mapOptions = {
-        zoom: 7,
-        center: {lat: 50.9373401, lng: 4.041093},
-        streetViewControl: false,
-        mapTypeControl: false,
-    }
+    settings: {
+        directionsDisplay: null,
+        directionsService: null,
+        map: null,
+        originInput: document.getElementById('origin'),
+        destinationInput: document.getElementById('destination'),
+        $originInput: $('#origin'),
+        $destinationInput: $('#destination'),
+        allModes: $('input[name="radios"]'),
+        selectedMode: $('input[name="radios"]:checked'),
+        origin: $('origin').val(),
+        destination: $('destination').val(),
+        travelMode: $('input[name="radios"]:checked').prop('id')
+    },
 
-    map = new google.maps.Map(document.getElementById('map'), mapOptions);
-    directionsService = new google.maps.DirectionsService();
-    directionsDisplay = new google.maps.DirectionsRenderer();
-    directionsDisplay.setMap(map);
-    var trafficLayer = new google.maps.TrafficLayer();
-    trafficLayer.setMap(map);
-
-    // inputs
-    var origin_input = document.getElementById('origin');
-    var destination_input = document.getElementById('destination');
-    var modes = document.getElementById('mode-select');
-
-
-    // autocomplete functions on inputs
-    var origin_autocomplete = new google.maps.places.Autocomplete(origin_input);
-    origin_autocomplete.bindTo('bounds', map);
-    var destination_autocomplete =
-    new google.maps.places.Autocomplete(destination_input);
-    destination_autocomplete.bindTo('bounds', map);
-
-    // check if route was already calculated and recalculate
-    if (localStorage.calculated === 'true') {
-        calculateRoute(localStorage.origin, localStorage.destination, defineTravelMode(localStorage.travelMode));
-    }
-    // try HTML5 geolocation if the route wasn't calculated
-    else {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-
-                map.setCenter(pos);
-            }, function() {
-                handleLocationError(true, infoWindow, map.getCenter());
-            });
+    init: function() {
+        mapS = this.settings;
+        var mapOptions = {
+            zoom: 7,
+            center: {lat: 50.9373401, lng: 4.041093},
+            streetViewControl: false,
+            mapTypeControl: false
         }
+
+        mapS.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        mapS.directionsService = new google.maps.DirectionsService();
+        mapS.directionsDisplay = new google.maps.DirectionsRenderer();
+        mapS.directionsDisplay.setMap(mapS.map);
+        var trafficLayer = new google.maps.TrafficLayer();
+        trafficLayer.setMap(mapS.map);
+
+        // inputs
+        var modes = document.getElementById('mode-select');
+
+        // autocomplete functions on inputs
+        var origin_autocomplete = new google.maps.places.Autocomplete(mapS.originInput);
+        origin_autocomplete.bindTo('bounds', mapS.map);
+        var destination_autocomplete = new google.maps.places.Autocomplete(mapS.destinationInput);
+        destination_autocomplete.bindTo('bounds', mapS.map);
+
+        // check if route was already calculated and recalculate
+        if (localStorage.getItem('calculated')) {
+            this.calculateRoute(localStorage.origin, localStorage.destination, this.defineTravelMode(localStorage.travelMode));
+        }
+        // try HTML5 geolocation if the route wasn't calculated
         else {
-            // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, map.getCenter());
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    mapS.map.setCenter(pos);
+                }, function() {
+                    mapS.handleLocationError(true, infoWindow, mapS.map.getCenter());
+                });
+            }
+            else {
+                // Browser doesn't support Geolocation
+                mapS.handleLocationError(false, infoWindow, mapS.map.getCenter());
+            }
         }
-    }
-}
+    },
 
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-    infoWindow.setPosition(pos);
-    infoWindow.setContent(browserHasGeolocation ?
-        'Error: The Geolocation service failed.' :
-        'Error: Your browser doesn\'t support geolocation.');
-}
+    handleLocationError: function(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+            'Error: The Geolocation service failed.' :
+            'Error: Your browser doesn\'t support geolocation.');
+    },
 
-/*
+    /*
     Calculates the route between 2 destinations using
     the google distancematrix api
     @param origin the chosen origin
     @param destination the chosen destination
     @param travelMode the selected travelmode
-*/
-function calculateRoute(origin, destination, travelMode) {
-    // the request for the directions
-    var request = {
-        origin:origin,
-        destination:destination,
-        travelMode: travelMode
-    };
+    */
+    calculateRoute: function(origin, destination, travelMode) {
+        // the request for the directions
+        var request = {
+            origin:origin,
+            destination:destination,
+            travelMode: travelMode
+        };
 
-    // use the returned results to set the route
-    directionsService.route(request, function(result, status) {
-        if (status == google.maps.DirectionsStatus.OK) {
-          directionsDisplay.setDirections(result);
-        }
-    });
+        // use the returned results to set the route
+        mapS.directionsService.route(request, function(result, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+              mapS.directionsDisplay.setDirections(result);
+            }
+        });
 
-    var service = new google.maps.DistanceMatrixService();
-    service.getDistanceMatrix(
-        {
-            origins: [origin],
-            destinations: [destination],
-            travelMode: travelMode,
-            unitSystem: google.maps.UnitSystem.METRIC,
-            avoidHighways: false,
-            avoidTolls: false,
-        }, callback);
+        var service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix(
+            {
+                origins: [origin],
+                destinations: [destination],
+                travelMode: travelMode,
+                unitSystem: google.maps.UnitSystem.METRIC,
+                avoidHighways: false,
+                avoidTolls: false,
+            }, callback);
 
-    // callback function
-    function callback(response, status) {
-        if (status == google.maps.DistanceMatrixStatus.OK) {
-            var origins = response.originAddresses;
-            var destinations = response.destinationAddresses;
+        // callback function
+        function callback(response, status) {
+            if (status == google.maps.DistanceMatrixStatus.OK) {
+                var origins = response.originAddresses;
+                var destinations = response.destinationAddresses;
 
-            for (var i = 0; i < origins.length; i++) {
-                var results = response.rows[i].elements;
-                for (var j = 0; j < results.length; j++) {
-                    var element = results[j];
-                    var distance = element.distance.text;
-                    var duration = element.duration.text;
-                    $('#estimate').text(duration);
-                    $('.estimate').css('display', 'inline-block');
-                    $('.duration-input').css('display', 'inline-block');
-                    var from = origins[i];
-                    var to = destinations[j];
+                for (var i = 0; i < origins.length; i++) {
+                    var results = response.rows[i].elements;
+                    for (var j = 0; j < results.length; j++) {
+                        var element = results[j];
+                        var distance = element.distance.text;
+                        var duration = element.duration.text;
+                        $('#estimate').text(duration);
+                        $('.estimate').css('display', 'inline-block');
+                        $('.duration-input').css('display', 'inline-block');
+                        var from = origins[i];
+                        var to = destinations[j];
+                    }
                 }
             }
         }
-    }
-}
+    },
 
+    /*
+        function to define the travelmode from a given string
+        @param string mode
+        @return google.maps.TraveMode.*
+    */
+    defineTravelMode: function(mode) {
+        if (mode == "driving") {
+            return google.maps.TravelMode.DRIVING;
+        }
+        else if (mode == "bicycling") {
+            return google.maps.TravelMode.BICYCLING;
+        }
+        else {
+            return google.maps.TravelMode.WALKING;
+        }
+    }
+};
 
-/*
-    function to define the travelmode from a given string
-    @param string mode
-    @return google.maps.TraveMode.*
-*/
-function defineTravelMode(mode) {
-    if (mode == "driving") {
-        return google.maps.TravelMode.DRIVING;
-    }
-    else if (mode == "bicycling") {
-        return google.maps.TravelMode.BICYCLING;
-    }
-    else {
-        return google.maps.TravelMode.WALKING;
-    }
+window.initMap = function() {
+    mapModule.init();
+    actionModule.init();
+    storageModule.init();
 }
 
 /*--------------------------------------------------
