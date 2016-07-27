@@ -1,122 +1,191 @@
-var Chart = require("chart.js");
-//var graph = new Chart
-
-//declare variables
-var $origin = $('#origin');
-var $destination = $('#destination');
-var $allmodes = $('input[name="radios"]');
-var $mode = $('input[name="radios"]:checked');
-var $switchbutton = $('.switchdest-button');
-var $submitbutton = $('#search');
-var $addtimeButton = $('#addtime');
-
-// check if there's something in localstorage, and if so,
-// fill in the values or select the right mode
-if(typeof(Storage) !== "undefined") {
-    // set destination and origin from localstorage
-    if (localStorage.origin && localStorage.origin !== '') {
-        $origin.val(localStorage.origin);
-    }
-    if (localStorage.destination && localStorage.destination !== '') {
-        $destination.val(localStorage.destination);
-    }
-    // set modes if localstorage has one defined
-    if (localStorage.travelMode) {
-        if (localStorage.travelMode === 'driving') {
-            $('#driving').prop('checked', true);
-        }
-        else if (localStorage.travelMode === 'bicycling') {
-            $('#bicycling').prop('checked', true);
-        }
-        else {
-            $('#walking').prop('checked', true);
-        }
-    }
-    // set driving as default mode
-    else {
-        $('#driving').prop('checked', true);
-    }
-    // disable buttons if the route has been calculated
-    if (localStorage.calculated === 'true') {
-        $origin.prop('disabled', true);
-        $destination.prop('disabled', true);
-        $allmodes.prop('disabled', true);
-        $submitbutton.val('Edit');
-        $switchbutton.prop('disabled', true);
-    }
-}
-else {
-    console.log("No localstorage supported");
-}
+/*
+    Clientside Webscripten 1 - Google Maps API
+    @author Arnaud Weyts
+*/
 
 /*
-    gets the values from the inputs to calculate the route
-    or shows the dialog to edit the inputs if a route was
-    already calculated
+*   The storage module handles all of the storage actions
+*   f.e. getting data from localstorage and setting data in
+*   localstorage
 */
-$submitbutton.click(function(e) {
-    e.preventDefault();
-    // calculating a route
-    if ($submitbutton.val() === "Search") {
-        // get input and set them in localstorage
-        localStorage.origin = $origin.val();
-        localStorage.destination = $destination.val();
-        $mode = $('input[name="radios"]:checked');
-        localStorage.travelMode = $mode.prop('id');
-        // disable inputs
-        $submitbutton.val('Edit');
-        $origin.prop('disabled', true);
-        $destination.prop('disabled', true);
-        $('input[name="radios"]').prop('disabled', true);
-        // calculate the route & tell localstorage a route was calculated
-        calculateRoute($origin.val(), $destination.val(), defineTravelMode($mode.prop('id')));
-        localStorage.calculated = 'true';
-    }
-    // show dialog to confirm changes
-    else {
-        $('#dialog-confirm').dialog({
-            resizable: false,
-            height:140,
-            modal: true,
-            autoOpen: false,
-            buttons: {
-                "Delete all items": function() {
-                    $(this).dialog( "close" );
-                    $submitbutton.val('Search');
-                    $origin.prop('disabled', false);
-                    $destination.prop('disabled', false);
-                    $('input[name="radios"]').prop('disabled', false);
-                    localStorage.clear();
-                },
-                Cancel: function() {
-                    $(this).dialog( "close" );
+
+var $ = require("jquery");
+
+var storageS,
+    storageModule = {
+
+    settings: {
+        // inputs and buttons
+        originInput: $('origin'),
+        destinationInput: $('destination'),
+        allModes: $('input[name="radios"]'),
+        selectedMode: $('input[name="radios"]:checked'),
+        switchButton: $('.switchdest-button'),
+        submitButton: $('#search'),
+        addtimeButton: $('#addtime'),
+        // actual variables
+        origin: $('origin').val(),
+        destination: $('destination').val(),
+        travelMode: $('input[name="radios"]:checked').prop('id')
+    },
+
+    init: function() {
+        // kick things off
+        storageS = this.settings;
+        this.loadFromStorage();
+    },
+
+    /*
+        This function sets the data in localstorage
+    */
+    setTravelData: function() {
+        var travelData = {
+            origin: this.origin.val,
+            destination: this.destination.val,
+            mode: this.travelMode
+        };
+
+        localStorage.setItem('travelData', JSON.stringify(travelData));
+        localStorage.setItem('calculated', true);
+    },
+
+    /*
+        Loads stuff from localstorage if there's something to be found
+        WIP
+    */
+    loadFromStorage: function() {
+        if(typeof(Storage) !== "undefined") {
+
+            // get data from localstorage
+            var travelData = JSON.parse(localStorage.getItem('travelData'));
+            this.origin = travelData.origin;
+            this.destination = travelData.destination;
+            this.travelMode = travelData.mode;
+
+            // set modes if localstorage has one defined
+            if (this.travelMode) {
+                if (this.travelMode === 'driving') {
+                    $('#driving').prop('checked', true);
+                }
+                else if (this.travelMode === 'bicycling') {
+                    $('#bicycling').prop('checked', true);
+                }
+                else {
+                    $('#walking').prop('checked', true);
                 }
             }
+            // set driving as default mode
+            else {
+                $('#driving').prop('checked', true);
+            }
+            // disable buttons if the route has been calculated
+            if (localStorage.getItem('calculated') === 'true') {
+                this.originInput.prop('disabled', true);
+                this.destinationInput.prop('disabled', true);
+                this.allModes.prop('disabled', true);
+                this.submitButton.val('Edit');
+                this.switchButton.prop('disabled', true);
+            }
+        }
+        else {
+            window.console.log("No localstorage supported");
+        }
+    }
+};
+
+var actionS,
+    actionModule = {
+
+    settings: {
+        originInput: $('origin'),
+        destinationInput: $('destination'),
+        allModes: $('input[name="radios"]'),
+        submitButton: $('#search'),
+        addtimeButton: $('#addtime'),
+        switchButton: $('#switch')
+    },
+
+    init: function() {
+        actionS = this.settings;
+        this.bundUIActions();
+    },
+
+    /*
+    *   Enables or disables all of the inputs
+    */
+    toggleInputs: function(disable) {
+        this.originInput.prop('disabled', disable);
+        this.destinationInput.prop('disabled', disable);
+        this.allModes.prop('disabled', disable);
+        if (disable) {
+            this.submitButton.val('Edit');
+        }
+        else {
+            this.submitButton.val('Search');
+        }
+    },
+
+    /*
+    *   Handle all the UI actions, all the button etc.
+    */
+    bindUIActions: function() {
+        /*
+            gets the values from the inputs to calculate the route
+            or shows the dialog to edit the inputs if a route was
+            already calculated
+        */
+        this.submitButton.click(function(e) {
+            e.preventDefault();
+            // calculating a route
+            if (this.submitButton.val() === "Search") {
+                // get input and set them in localstorage
+                storageModule.setTravelData();
+
+                // disable buttons
+                this.toggleInputs(true);
+
+                // calculate the route & tell localstorage a route was calculated
+                calculateRoute($origin.val(), $destination.val(), defineTravelMode($mode.prop('id')));
+            }
+            // show dialog to confirm changes
+            else {
+                $('#dialog-confirm').dialog({
+                    resizable: false,
+                    height:140,
+                    modal: true,
+                    autoOpen: false,
+                    buttons: {
+                        "Delete all items": function() {
+                            $(this).dialog( "close" );
+                            // enable the inputs again
+                            this.toggleInputs(false);
+                            // clear localstorage
+                            localStorage.clear();
+                        },
+                        Cancel: function() {
+                            $(this).dialog( "close" );
+                        }
+                    }
+                });
+                $('#dialog-confirm').dialog('open');
+            }
         });
-        $('#dialog-confirm').dialog('open');
-    }
-});
 
-/*
-    Switches the origin and destination
-*/
-$switchbutton.click(function(e) {
-    e.preventDefault();
-    if ($submitbutton.val() === "Search") {
-        $originvalue = $origin.val();
-        $destvalue = $destination.val();
-        $origin.val($destvalue);
-        $destination.val($originvalue);
+        /*
+        *   Switches destination and origin around
+        */
+        this.switchButton.click(function(e) {
+            e.preventDefault();
+            if (this.submitButton.val() === "Search") {
+                var originvalue = this.originInput.val();
+                var destvalue = this.destinationInput.val();
+                this.originInput.val(destvalue);
+                this.destinationInput.val(originvalue);
+            }
+        });
     }
-});
 
-/*
-    Adds their own traveltime to the graph
-*/
-$addtimeButton.click(function(e) {
-    e.preventDefault();
-    
-})
+};
 
 /*----------------------------------------------------
 -                    GOOGLE MAPS                     -
@@ -193,27 +262,11 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 /*
     Calculates the route between 2 destinations using
     the google distancematrix api
+    @param origin the chosen origin
+    @param destination the chosen destination
+    @param travelMode the selected travelmode
 */
 function calculateRoute(origin, destination, travelMode) {
-    /*var request = {
-        origin: $origin.val(),
-        destination: $destination.val(),
-        travelMode: google.maps.TravelMode.DRIVING
-    };
-    directionsService.route(request, function(result, status) {
-        if (status == google.maps.DirectionsStatus.OK) {
-            directionsDisplay.setDirections(result);
-        }
-    });
-    xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
-            $('#distancematrix').html(xhr.responseText);
-        }
-    };
-    xhr.open('GET', '/assets/distancematrix.php', true);
-    xhr.send();*/
-
     // the request for the directions
     var request = {
         origin:origin,
@@ -239,6 +292,7 @@ function calculateRoute(origin, destination, travelMode) {
             avoidTolls: false,
         }, callback);
 
+    // callback function
     function callback(response, status) {
         if (status == google.maps.DistanceMatrixStatus.OK) {
             var origins = response.originAddresses;
@@ -261,6 +315,12 @@ function calculateRoute(origin, destination, travelMode) {
     }
 }
 
+
+/*
+    function to define the travelmode from a given string
+    @param string mode
+    @return google.maps.TraveMode.*
+*/
 function defineTravelMode(mode) {
     if (mode == "driving") {
         return google.maps.TravelMode.DRIVING;
@@ -271,4 +331,97 @@ function defineTravelMode(mode) {
     else {
         return google.maps.TravelMode.WALKING;
     }
+}
+
+/*--------------------------------------------------
+-                   CHART.JS                       -
+---------------------------------------------------*/
+
+var Chart = require("chart.js");
+// get the chart
+var ctx = $("#travelchart");
+
+// set the default options on the data, and enter empty data
+var data =
+    {
+        labels: [],
+        datasets: [
+            {
+                label: "Google estimate",
+                fill: false,
+                backgroundColor: "#84CA50",
+                borderColor: "#84CA50",
+                pointBorderColor: "#84CA50",
+                pointBackgroundColor: "#fff",
+                pointHoverBackgroundColor: "#84CA50",
+                pointHoverBorderColor: "#84CA50",
+                pointHoverBorderWidth: 5,
+                data: []
+            },
+            {
+                label: "Your travel time",
+                fill: false,
+                backgroundColor: "#3367D6",
+                borderColor: "#3367D6",
+                pointBorderColor: "#3367D6",
+                pointBackgroundColor: "#fff",
+                pointHoverBackgroundColor: "#3367D6",
+                pointHoverBorderColor: "#3367D6",
+                pointHoverBorderWidth: 5,
+                data: []
+            }
+        ]
+    }
+
+
+var travelChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+        scales: {
+            xAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'DateTime DD/MM HH:MM',
+                    fontFamily: 'Roboto',
+                    fontStyle: 'bold'
+
+                },
+                ticks: {
+                    fontFamily: 'Roboto'
+                }
+            }],
+            yAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Time (min)',
+                    fontFamily: 'Roboto',
+                    fontStyle: 'bold'
+                },
+                ticks: {
+                    fontFamily: 'Roboto'
+                }
+            }],
+        },
+        tooltips: {
+            mode: 'label',
+            fontFamily: 'Roboto',
+            backgroundColor: 'rgba(42,42,42,1)'
+        }
+    }
+});
+
+/*
+* Function to add a data pair to the graph
+*
+* @param number google's estimate
+* @param number the user's input
+* @param string date
+*/
+function addGraphData(data1, data2, label) {
+    // Add data to graph
+    this.graph.data.datasets[0].data.push(parseInt(data1));
+    this.graph.data.datasets[1].data.push(parseInt(data2));
+    this.graph.data.labels.push(label);
+    this.graph.update();
 }
