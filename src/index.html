@@ -19,7 +19,7 @@
 			<section id="searchbar">
 				<label for="origin"></label>
 				<input type="search" name="origin" id="origin" placeholder="Choose origin"/>
-				<label for="destination"><a class="unselect switchdest-button"><i id="switchIcon" class="icon-swap"></i></a></label>
+				<label for="destination"><a id="switch" class="unselect switchdest-button"><i id="switchIcon" class="icon-swap"></i></a></label>
 				<input type="search" name="destination" id="destination" placeholder="Choose destination"/>
 			</section>
 			<section id="modeselect">
@@ -66,6 +66,7 @@
 		</div>
 		<section>
 			<h2 class="graphtitle">Graph</h2>
+			<canvas id="travelchart" class="travelchart"></canvas>
 		</section>
 	</div>
 	<script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
