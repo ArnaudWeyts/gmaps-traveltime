@@ -168,8 +168,44 @@ var actionS,
                 mapS.$destinationInput.val(originvalue);
             }
         });
-    }
 
+        /*
+        *   Handles everything when you add a traveltime
+        */
+        actionS.addtimeButton.click(function(e) {
+            e.preventDefault();
+            window.console.log("addtime pushed");
+        });
+    },
+
+    /**
+    * Function to calculate minutes from days, hours and minutes
+    *
+    * @param days int Number of days
+    * @param hours hours Number of hours
+    * @param minutes minutes Number of minutes
+    * @return number Calcuted amount of minutes from days, hours and minutes
+    */
+    getMinutes: function(days, hours, minutes) {
+        var mins = minutes ? parseInt(minutes) : 0;
+        mins += days ? days * 1440 : 0;
+        mins += hours ? hours * 60 : 0;
+        return mins;
+    },
+
+    /**
+    * Function to format a date to format DD/MM HH:mm
+    * 
+    * @param object date The date that needs to be formatted
+    * @return string The date formatted as DD/MM HH:mm
+    */
+    formatDate: function(date) {
+        var hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+        var minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+        var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+        var month = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+        return day + '/' + month + ' ' + hours + ':' + minutes;
+    }
 };
 
 /*----------------------------------------------------
@@ -347,14 +383,14 @@ var data =
         labels: [],
         datasets: [
             {
-                label: "Google estimate",
+                label: "Google's estimate",
                 fill: false,
-                backgroundColor: "#84CA50",
-                borderColor: "#84CA50",
-                pointBorderColor: "#84CA50",
+                backgroundColor: "#43A047",
+                borderColor: "#43A047",
+                pointBorderColor: "#43A047",
                 pointBackgroundColor: "#fff",
-                pointHoverBackgroundColor: "#84CA50",
-                pointHoverBorderColor: "#84CA50",
+                pointHoverBackgroundColor: "#43A047",
+                pointHoverBorderColor: "#43A047",
                 pointHoverBorderWidth: 5,
                 data: []
             },
@@ -399,6 +435,7 @@ var travelChart = new Chart(ctx, {
                     fontStyle: 'bold'
                 },
                 ticks: {
+                    beginAtZero: true,
                     fontFamily: 'Roboto'
                 }
             }],
