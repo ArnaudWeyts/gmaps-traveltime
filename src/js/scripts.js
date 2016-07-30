@@ -9,18 +9,10 @@
 *   localstorage
 */
 
-var $ = require("jquery");
-
-var storageS,
-    storageModule = {
-
-    settings: {
-
-    },
+var storageModule = {
 
     init: function() {
         // kick things off
-        storageS = this.settings;
         this.loadFromStorage();
     },
 
@@ -35,7 +27,6 @@ var storageS,
         };
 
         localStorage.setItem('travelData', JSON.stringify(travelData));
-        localStorage.setItem('calculated', true);
     },
 
     /*
@@ -47,12 +38,11 @@ var storageS,
 
             // get data from localstorage
             var travelData = JSON.parse(localStorage.getItem('travelData'));
-            mapS.origin = travelData.origin;
-            mapS.destination = travelData.destination;
-            mapS.travelMode = travelData.mode;
+            if (travelData !== null) {
+                mapS.origin = travelData.origin;
+                mapS.destination = travelData.destination;
+                mapS.travelMode = travelData.mode;
 
-            // set modes if localstorage has one defined
-            if (mapS.travelMode) {
                 if (mapS.travelMode === 'driving') {
                     $('#driving').prop('checked', true);
                 }
@@ -62,18 +52,23 @@ var storageS,
                 else {
                     $('#walking').prop('checked', true);
                 }
-            }
-            // set driving as default mode
-            else {
-                $('#driving').prop('checked', true);
-            }
-            // disable buttons if the route has been calculated
-            if (localStorage.getItem('calculated') === 'true') {
-                mapS.originInput.prop('disabled', true);
-                mapS.destinationInput.prop('disabled', true);
+
+                // set the inputs
+                mapS.$originInput.val(mapS.origin);
+                mapS.$destinationInput.val(mapS.destination);
+
+                // disable buttons if the route has been calculated
+                mapS.$originInput.prop('disabled', true);
+                mapS.$destinationInput.prop('disabled', true);
                 mapS.allModes.prop('disabled', true);
                 actionS.submitButton.val('Edit');
                 actionS.switchButton.prop('disabled', true);
+
+                mapModule.calculateRoute(mapS.origin, mapS.destination, mapModule.defineTravelMode(mapS.travelMode));
+            }
+            else {
+                // set driving as default mode
+                $('#driving').prop('checked', true);
             }
         }
         else {
@@ -103,8 +98,8 @@ var actionS,
     *   Enables or disables all of the inputs
     */
     toggleInputs: function(disable) {
-        mapS.originInput.prop('disabled', disable);
-        mapS.destinationInput.prop('disabled', disable);
+        mapS.$originInput.prop('disabled', disable);
+        mapS.$destinationInput.prop('disabled', disable);
         mapS.allModes.prop('disabled', disable);
         if (disable) {
             actionS.submitButton.val('Edit');
@@ -128,13 +123,14 @@ var actionS,
             // calculating a route
             if (actionS.submitButton.val() === "Search") {
                 // get input and set them in localstorage
+                mapModule.getInputs();
                 storageModule.setTravelData();
 
                 // disable buttons
-                this.toggleInputs(true);
+                actionModule.toggleInputs(true);
 
                 // calculate the route & tell localstorage a route was calculated
-                this.calculateRoute(mapS.origin, mapS.destination, this.defineTravelMode(mapS.travelMode));
+                mapModule.calculateRoute(mapS.origin, mapS.destination, mapModule.defineTravelMode(mapS.travelMode));
             }
             // show dialog to confirm changes
             else {
@@ -147,7 +143,7 @@ var actionS,
                         "Delete all items": function() {
                             $(this).dialog( "close" );
                             // enable the inputs again
-                            this.toggleInputs(false);
+                            actionModule.toggleInputs(false);
                             // clear localstorage
                             localStorage.clear();
                         },
@@ -193,8 +189,8 @@ var mapS,
         $destinationInput: $('#destination'),
         allModes: $('input[name="radios"]'),
         selectedMode: $('input[name="radios"]:checked'),
-        origin: $('origin').val(),
-        destination: $('destination').val(),
+        origin: $('#origin').val(),
+        destination: $('#destination').val(),
         travelMode: $('input[name="radios"]:checked').prop('id')
     },
 
@@ -214,21 +210,15 @@ var mapS,
         var trafficLayer = new google.maps.TrafficLayer();
         trafficLayer.setMap(mapS.map);
 
-        // inputs
-        var modes = document.getElementById('mode-select');
-
         // autocomplete functions on inputs
         var origin_autocomplete = new google.maps.places.Autocomplete(mapS.originInput);
         origin_autocomplete.bindTo('bounds', mapS.map);
         var destination_autocomplete = new google.maps.places.Autocomplete(mapS.destinationInput);
         destination_autocomplete.bindTo('bounds', mapS.map);
 
-        // check if route was already calculated and recalculate
-        if (localStorage.getItem('calculated')) {
-            this.calculateRoute(localStorage.origin, localStorage.destination, this.defineTravelMode(localStorage.travelMode));
-        }
-        // try HTML5 geolocation if the route wasn't calculated
-        else {
+        // check if route was already calculated
+        if (!localStorage.getItem('travelData')) {
+            // try HTML5 geolocation if the route wasn't calculated
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     var pos = {
@@ -326,9 +316,17 @@ var mapS,
         else {
             return google.maps.TravelMode.WALKING;
         }
+    },
+
+    getInputs: function() {
+        mapS.origin = $('#origin').val();
+        mapS.destination = $('#destination').val();
+        mapS.travelMode = $('input[name="radios"]:checked').prop('id');
+        console.log(mapS.origin);
     }
 };
 
+// this function inits everything, and is used in the callback by google
 window.initMap = function() {
     mapModule.init();
     actionModule.init();
