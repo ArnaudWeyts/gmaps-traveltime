@@ -3,6 +3,10 @@ module.exports = {
         "browser": true,
         "commonjs": true
     },
+    "globals": {
+        "$": 1,
+        "google": 1
+    },
     "extends": "eslint:recommended",
     "rules": {
         "accessor-pairs": "error",
