@@ -4,6 +4,17 @@
 */
 
 /**
+* This function inits everything, and is used in the callback by google
+* @returns {void}
+*/
+window.initMap = function() {
+    mapModule.init();
+    chartModule.init();
+    actionModule.init();
+    storageModule.init();
+}
+
+/**
 * The storage module handles all of the storage actions
 * f.e. getting data from localstorage and setting data in
 * localstorage
@@ -94,7 +105,8 @@ var storageModule = {
                 }
             }
             else {
-                // set driving as default mode
+                // set all the inputs to default
+                actionModule.toggleInputs(false);
                 $('#driving').prop('checked', true);
             }
         }
@@ -205,11 +217,13 @@ var actionS,
         actionS.addtimeButton.click(function(e) {
             e.preventDefault();
             // Calculate time in minutes
-            var time = actionModule.getMinutes($('#day').val(), $('#hour').val(), $('#min').val());
+            var time = actionModule.getMinutes($('#days').val(), $('#hours').val(), $('#minutes').val());
 
             // Get travel duration from Google Maps, display it and add it to the graph
             var mapTime = $('#estimate').text();
             chartModule.addChartData(mapTime, time, actionModule.formatDate(new Date()));
+
+            storageModule.setchartData();
         });
     },
 
@@ -221,17 +235,17 @@ var actionS,
     * @returns {number} Calcuted amount of minutes from days, hours and minutes
     */
     getMinutes: function(days, hours, minutes) {
-        var mins = minutes ?
+        var totalMins = minutes ?
             parseInt(minutes) :
             0;
-        mins += days ?
+        totalMins += days ?
             days * 1440 :
             0;
-        mins += hours ?
+        totalMins += hours ?
             hours * 60 :
             0;
 
-        return mins;
+        return totalMins;
     },
 
     /**
@@ -324,6 +338,12 @@ var mapS,
                 mapS.handleLocationError(false, infoWindow, mapS.map.getCenter());
             }
         }
+
+        google.maps.event.addDomListener(window, 'resize', function() {
+            var center = mapS.map.getCenter();
+            google.maps.event.trigger(mapS.map, "resize");
+            mapS.map.setCenter(center);
+        });
     },
 
     /**
@@ -389,6 +409,7 @@ var mapS,
                         $('#estimate').text(duration);
                         $('.estimate').css('display', 'inline-block');
                         $('.duration-input').css('display', 'inline-block');
+                        $('.graph').show();
                         //var from = origins[i];
                         //var to = destinations[j];
                     }
@@ -424,17 +445,6 @@ var mapS,
         mapS.travelMode = $('input[name="radios"]:checked').prop('id');
     }
 };
-
-/**
-* This function inits everything, and is used in the callback by google
-* @returns {void}
-*/
-window.initMap = function() {
-    mapModule.init();
-    chartModule.init();
-    actionModule.init();
-    storageModule.init();
-}
 
 /**
 * The chart module handles all the graph stuff
@@ -488,7 +498,7 @@ var chartS,
                     xAxes: [{
                         scaleLabel: {
                             display: true,
-                            labelString: 'DateTime DD/MM HH:MM',
+                            labelString: 'Date & Time DD/MM HH:MM',
                             fontFamily: 'Roboto',
                             fontStyle: 'bold'
 
@@ -500,7 +510,7 @@ var chartS,
                     yAxes: [{
                         scaleLabel: {
                             display: true,
-                            labelString: 'Time (min)',
+                            labelString: 'Duration (min)',
                             fontFamily: 'Roboto',
                             fontStyle: 'bold'
                         },
