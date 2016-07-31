@@ -5,7 +5,8 @@ module.exports = {
     },
     "globals": {
         "$": 1,
-        "google": 1
+        "google": 1,
+        "infoWindow": 1
     },
     "extends": "eslint:recommended",
     "rules": {
@@ -63,7 +64,7 @@ module.exports = {
             "declaration"
         ],
         "generator-star-spacing": "error",
-        "global-require": "error",
+        "global-require": "off",
         "guard-for-in": "error",
         "handle-callback-err": "error",
         "id-blacklist": "error",
@@ -125,14 +126,7 @@ module.exports = {
         "no-lone-blocks": "error",
         "no-lonely-if": "off",
         "no-loop-func": "error",
-        "no-magic-numbers": [
-            "error",
-            {
-                "detectObjects": false,
-                "enforceConst": false,
-                "ignoreArrayIndexes": true
-            }
-        ],
+        "no-magic-numbers": "off",
         "no-mixed-operators": "error",
         "no-mixed-requires": "error",
         "no-multi-spaces": "error",
@@ -217,7 +211,7 @@ module.exports = {
         "prefer-reflect": "error",
         "prefer-rest-params": "error",
         "prefer-spread": "error",
-        "prefer-template": "error",
+        "prefer-template": "off",
         "quote-props": "off",
         "quotes": "off",
         "radix": [
