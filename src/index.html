@@ -18,25 +18,25 @@
 		<form>
 			<section id="searchbar">
 				<label for="origin"></label>
-				<input type="search" name="origin" id="origin" placeholder="Choose origin"/>
-				<label for="destination"><a id="switch" class="unselect switchdest-button"><i id="switchIcon" class="icon-swap"></i></a></label>
-				<input type="search" name="destination" id="destination" placeholder="Choose destination"/>
+				<input type="search" name="origin" id="origin" placeholder="Choose origin" disabled/>
+				<label for="destination"><a id="switch" class="unselect switchdest-button" disabled><i id="switchIcon" class="icon-swap"></i></a></label>
+				<input type="search" name="destination" id="destination" placeholder="Choose destination" disabled/>
 			</section>
 			<section id="modeselect">
 				<label for="driving">
-					<input type="radio" name="radios" id="driving" />
+					<input type="radio" name="radios" id="driving" disabled/>
 					<span class="unselect">
 						<i class="align-icon icon-car"></i>
 					</span>
 				</label>
 				<label for="bicycling">
-					<input type="radio" name="radios" id="bicycling" />
+					<input type="radio" name="radios" id="bicycling" disabled/>
 					<span class="unselect">
 						<i class="align-icon icon-bike"></i>
 					</span>
 				</label>
 				<label for="walking">
-					<input type="radio" name="radios" id="walking" />
+					<input type="radio" name="radios" id="walking" disabled/>
 					<span class="unselect">
 						<i class="align-icon icon-walk"></i>
 					</span>
@@ -64,9 +64,14 @@
 				<input class="addtime-btn" id="addtime" type="submit" value="Add" name="addtime">
 			</div>
 		</div>
-		<section class="graph">
-			<h2 class="graphtitle">Graph</h2>
+		<section class="graph hide">
+			<h2 class="title">Graph</h2>
 			<canvas id="travelchart" class="travelchart"></canvas>
+		</section>
+		<section class="chartimages hide">
+			<label for="save"></label>
+			<input class="saveimage-btn" id="addtime" type="submit" value="Save" name="saveimage">
+			<h2 class="title">Saved graphs</h2>
 		</section>
 	</div>
 	<script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
