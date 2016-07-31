@@ -168,7 +168,7 @@ input[type="radio"] {
     width: 100%;
 }
 .map {
-    height: 27.5rem;
+    height: 30rem;
     width: 100%;
 }
 
@@ -201,15 +201,21 @@ input[type="radio"] {
     border-radius: 2px;
 }
 
-.graphtitle {
+.title {
     font-size: 2.5rem;
     margin-left: 1rem;
+    text-align: left;
 }
 
 .graph {
     width: 90%;
-    height: 30rem;
+    margin: 2rem auto;
+}
+
+.chartimages {
+    width: 90%;
     margin: 1rem auto;
+    text-align: center;
 }
 
 @media(max-width: 33rem) {
