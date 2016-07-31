@@ -1,14 +1,13 @@
-/*
-    Clientside Webscripten 1 - Google Maps API
-    @author Arnaud Weyts
+/**
+* Clientside Webscripten 1 - Google Maps API
+* @author Arnaud Weyts{arnaud.weyts@student.odisee.be}
 */
 
-/*
-*   The storage module handles all of the storage actions
-*   f.e. getting data from localstorage and setting data in
-*   localstorage
+/**
+* The storage module handles all of the storage actions
+* f.e. getting data from localstorage and setting data in
+* localstorage
 */
-
 var storageModule = {
 
     init: function() {
@@ -29,9 +28,9 @@ var storageModule = {
         localStorage.setItem('travelData', JSON.stringify(travelData));
     },
 
-    /*
-        Loads stuff from localstorage if there's something to be found
-        WIP
+    /**
+    * Loads stuff from localstorage if there's something found
+    * @returns {void}
     */
     loadFromStorage: function() {
         if(typeof(Storage) !== "undefined") {
@@ -77,6 +76,10 @@ var storageModule = {
     }
 };
 
+/**
+* The actionmodule handles all of the actions, this includes all the buttons.
+* It also contains some other commonly used functions
+*/
 var actionS,
     actionModule = {
 
@@ -94,8 +97,10 @@ var actionS,
         this.bindUIActions();
     },
 
-    /*
-    *   Enables or disables all of the inputs
+    /**
+    * Enables or disables all of the inputs
+    * @param {boolean} disable wether to disable it or not
+    * @returns {void}
     */
     toggleInputs: function(disable) {
         mapS.$originInput.prop('disabled', disable);
@@ -109,14 +114,15 @@ var actionS,
         }
     },
 
-    /*
-    *   Handle all the UI actions, all the button etc.
+    /**
+    * Handle all the UI actions, all the buttons etc.
+    * @returns {void}
     */
     bindUIActions: function() {
-        /*
-            gets the values from the inputs to calculate the route
-            or shows the dialog to edit the inputs if a route was
-            already calculated
+        /**
+        * gets the values from the inputs to calculate the route
+        * or shows the dialog to edit the inputs if a route was
+        * already calculated
         */
         actionS.submitButton.click(function(e) {
             e.preventDefault();
@@ -156,9 +162,7 @@ var actionS,
             }
         });
 
-        /*
-        *   Switches destination and origin around
-        */
+        // Switches destination and origin around
         actionS.switchButton.click(function(e) {
             e.preventDefault();
             if (actionS.submitButton.val() === "Search") {
@@ -169,9 +173,7 @@ var actionS,
             }
         });
 
-        /*
-        *   Handles everything when you add a traveltime
-        */
+        // Handles everything when you add a traveltime
         actionS.addtimeButton.click(function(e) {
             e.preventDefault();
             window.console.log("addtime pushed");
@@ -179,39 +181,52 @@ var actionS,
     },
 
     /**
-    * Function to calculate minutes from days, hours and minutes
-    *
-    * @param days int Number of days
-    * @param hours hours Number of hours
-    * @param minutes minutes Number of minutes
-    * @return number Calcuted amount of minutes from days, hours and minutes
+    * Calculates total of minutes from hours, minutes, days
+    * @param {number} days Number of days
+    * @param {number} hours Number of hours
+    * @param {number} minutes Number of minutes
+    * @returns {number} Calcuted amount of minutes from days, hours and minutes
     */
     getMinutes: function(days, hours, minutes) {
-        var mins = minutes ? parseInt(minutes) : 0;
-        mins += days ? days * 1440 : 0;
-        mins += hours ? hours * 60 : 0;
+        var mins = minutes ?
+            parseInt(minutes) :
+            0;
+        mins += days ?
+            days * 1440 :
+            0;
+        mins += hours ?
+            hours * 60 :
+            0;
+
         return mins;
     },
 
     /**
-    * Function to format a date to format DD/MM HH:mm
-    * 
-    * @param object date The date that needs to be formatted
-    * @return string The date formatted as DD/MM HH:mm
+    * Formats a date as DD/MM HH:mm
+    * @param {object} date The date that needs to be formatted
+    * @returns {string} The date formatted as DD/MM HH:mm
     */
     formatDate: function(date) {
-        var hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-        var minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-        var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
-        var month = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+        var hours = date.getHours() < 10 ?
+            '0' + date.getHours() :
+            date.getHours();
+        var minutes = date.getMinutes() < 10 ?
+            '0' + date.getMinutes() :
+            date.getMinutes();
+        var day = date.getDate() < 10 ?
+            '0' + date.getDate() :
+            date.getDate();
+        var month = (date.getMonth() + 1) < 10 ?
+            '0' + (date.getMonth() + 1) :
+            (date.getMonth() + 1);
+
         return day + '/' + month + ' ' + hours + ':' + minutes;
     }
 };
 
-/*----------------------------------------------------
--                    GOOGLE MAPS                     -
-----------------------------------------------------*/
-
+/**
+* The mapmodule handles all of the map actions, the inputs, etc.
+*/
 var mapS,
     mapModule = {
 
@@ -230,6 +245,10 @@ var mapS,
         travelMode: $('input[name="radios"]:checked').prop('id')
     },
 
+    /**
+    * Inits the map, using the map options
+    * @returns {void}
+    */
     init: function() {
         mapS = this.settings;
         var mapOptions = {
@@ -273,7 +292,13 @@ var mapS,
             }
         }
     },
-
+    /**
+    * Function used when an error occurs in the map
+    * @param {boolean} browserHasGeolocation does the browser support geolocation
+    * @param {object} infoWindow the infowinow object
+    * @param {object} pos the position object
+    * @returns {void}
+    */
     handleLocationError: function(browserHasGeolocation, infoWindow, pos) {
         infoWindow.setPosition(pos);
         infoWindow.setContent(browserHasGeolocation ?
@@ -281,12 +306,13 @@ var mapS,
             'Error: Your browser doesn\'t support geolocation.');
     },
 
-    /*
-    Calculates the route between 2 destinations using
-    the google distancematrix api
-    @param origin the chosen origin
-    @param destination the chosen destination
-    @param travelMode the selected travelmode
+    /**
+    * Calculates the route between 2 destinations using
+    * the google distancematrix api
+    * @param {string} origin the chosen origin
+    * @param {string} destination the chosen destination
+    * @param {string} travelMode the selected travelmode
+    * @returns {void}
     */
     calculateRoute: function(origin, destination, travelMode) {
         // the request for the directions
@@ -318,29 +344,29 @@ var mapS,
         function callback(response, status) {
             if (status == google.maps.DistanceMatrixStatus.OK) {
                 var origins = response.originAddresses;
-                var destinations = response.destinationAddresses;
+                //var destinations = response.destinationAddresses;
 
                 for (var i = 0; i < origins.length; i++) {
                     var results = response.rows[i].elements;
                     for (var j = 0; j < results.length; j++) {
                         var element = results[j];
-                        var distance = element.distance.text;
+                        //var distance = element.distance.text;
                         var duration = element.duration.text;
                         $('#estimate').text(duration);
                         $('.estimate').css('display', 'inline-block');
                         $('.duration-input').css('display', 'inline-block');
-                        var from = origins[i];
-                        var to = destinations[j];
+                        //var from = origins[i];
+                        //var to = destinations[j];
                     }
                 }
             }
         }
     },
 
-    /*
-        function to define the travelmode from a given string
-        @param string mode
-        @return google.maps.TraveMode.*
+    /**
+    * Function to define the travelmode from a given string
+    * @param {string} mode the travelmode string
+    * @returns {object} google.maps.TraveMode.* the google maps travelmode object
     */
     defineTravelMode: function(mode) {
         if (mode == "driving") {
@@ -354,111 +380,123 @@ var mapS,
         }
     },
 
+    /**
+    * Function to get the current inputs
+    * @returns {void}
+    */
     getInputs: function() {
         mapS.origin = $('#origin').val();
         mapS.destination = $('#destination').val();
         mapS.travelMode = $('input[name="radios"]:checked').prop('id');
-        console.log(mapS.origin);
     }
 };
 
-// this function inits everything, and is used in the callback by google
+/**
+* This function inits everything, and is used in the callback by google
+* @returns {void}
+*/
 window.initMap = function() {
     mapModule.init();
     actionModule.init();
     storageModule.init();
+    chartModule.init();
 }
 
-/*--------------------------------------------------
--                   CHART.JS                       -
----------------------------------------------------*/
-
-var Chart = require("chart.js");
-// get the chart
-var ctx = $("#travelchart");
-
-// set the default options on the data, and enter empty data
-var data =
-    {
-        labels: [],
-        datasets: [
-            {
-                label: "Google's estimate",
-                fill: false,
-                backgroundColor: "#43A047",
-                borderColor: "#43A047",
-                pointBorderColor: "#43A047",
-                pointBackgroundColor: "#fff",
-                pointHoverBackgroundColor: "#43A047",
-                pointHoverBorderColor: "#43A047",
-                pointHoverBorderWidth: 5,
-                data: []
-            },
-            {
-                label: "Your travel time",
-                fill: false,
-                backgroundColor: "#3367D6",
-                borderColor: "#3367D6",
-                pointBorderColor: "#3367D6",
-                pointBackgroundColor: "#fff",
-                pointHoverBackgroundColor: "#3367D6",
-                pointHoverBorderColor: "#3367D6",
-                pointHoverBorderWidth: 5,
-                data: []
-            }
-        ]
-    }
-
-
-var travelChart = new Chart(ctx, {
-    type: 'line',
-    data: data,
-    options: {
-        scales: {
-            xAxes: [{
-                scaleLabel: {
-                    display: true,
-                    labelString: 'DateTime DD/MM HH:MM',
-                    fontFamily: 'Roboto',
-                    fontStyle: 'bold'
-
-                },
-                ticks: {
-                    fontFamily: 'Roboto'
-                }
-            }],
-            yAxes: [{
-                scaleLabel: {
-                    display: true,
-                    labelString: 'Time (min)',
-                    fontFamily: 'Roboto',
-                    fontStyle: 'bold'
-                },
-                ticks: {
-                    beginAtZero: true,
-                    fontFamily: 'Roboto'
-                }
-            }],
-        },
-        tooltips: {
-            mode: 'label',
-            fontFamily: 'Roboto',
-            backgroundColor: 'rgba(42,42,42,1)'
-        }
-    }
-});
-
-/*
-* Function to add a data pair to the graph
-*
-* @param number google's estimate
-* @param number the user's input
-* @param string date
+/**
+* The chart module handles all the graph stuff
 */
-function addGraphData(data1, data2, label) {
-    // Add data to graph
-    this.graph.data.datasets[0].data.push(parseInt(data1));
-    this.graph.data.datasets[1].data.push(parseInt(data2));
-    this.graph.data.labels.push(label);
-    this.graph.update();
+var chartS,
+    chartModule = {
+
+    settings: {
+        Chart: require("chart.js"),
+        ctx: $("#travelchart"),
+        travelChart: null,
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: "Google's estimate",
+                    fill: false,
+                    backgroundColor: "#43A047",
+                    borderColor: "#43A047",
+                    pointBorderColor: "#43A047",
+                    pointBackgroundColor: "#fff",
+                    pointHoverBackgroundColor: "#43A047",
+                    pointHoverBorderColor: "#43A047",
+                    pointHoverBorderWidth: 5,
+                    data: []
+                },
+                {
+                    label: "Your travel time",
+                    fill: false,
+                    backgroundColor: "#3367D6",
+                    borderColor: "#3367D6",
+                    pointBorderColor: "#3367D6",
+                    pointBackgroundColor: "#fff",
+                    pointHoverBackgroundColor: "#3367D6",
+                    pointHoverBorderColor: "#3367D6",
+                    pointHoverBorderWidth: 5,
+                    data: []
+                }
+            ]
+        },
+
+    },
+
+    init: function() {
+        chartS = this.settings;
+        chartS.travelChart = new chartS.Chart(chartS.ctx, {
+            type: 'line',
+            data: chartS.data,
+            options: {
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'DateTime DD/MM HH:MM',
+                            fontFamily: 'Roboto',
+                            fontStyle: 'bold'
+
+                        },
+                        ticks: {
+                            fontFamily: 'Roboto'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time (min)',
+                            fontFamily: 'Roboto',
+                            fontStyle: 'bold'
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            fontFamily: 'Roboto'
+                        }
+                    }],
+                },
+                tooltips: {
+                    mode: 'label',
+                    fontFamily: 'Roboto',
+                    backgroundColor: 'rgba(42,42,42,1)'
+                }
+            }
+        });
+    },
+
+    /**
+    * Function to add a data pair to the graph
+    * @param {number} data1 google's estimate
+    * @param {number} data2 the user's input
+    * @param {string} label date
+    * @returns {void}
+    */
+    addGraphData: function(data1, data2, label) {
+        // Add data to graph
+        chartS.travelChart.data.datasets[0].data.push(parseInt(data1));
+        chartS.travelChart.data.datasets[1].data.push(parseInt(data2));
+        chartS.travelChart.data.labels.push(label);
+        chartS.travelChart.update();
+    }
 }
