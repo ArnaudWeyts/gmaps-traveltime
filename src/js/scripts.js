@@ -15,8 +15,9 @@ var storageModule = {
         this.loadFromStorage();
     },
 
-    /*
-        This function sets the data in localstorage
+    /**
+    * This function sets the data in localstorage
+    * @returns {void}
     */
     setTravelData: function() {
         var travelData = {
@@ -26,6 +27,21 @@ var storageModule = {
         };
 
         localStorage.setItem('travelData', JSON.stringify(travelData));
+    },
+
+    /**
+    * Function to set graph data in local storage
+    * @returns {void}
+    */
+    setchartData: function() {
+        var chartData = {
+            user: chartS.data.datasets[0].data,
+            google: chartS.data.datasets[1].data,
+            labels: chartS.data.labels
+        }
+
+        // Write object to localstorage
+        localStorage.setItem('chartData', JSON.stringify(chartData));
     },
 
     /**
@@ -64,6 +80,18 @@ var storageModule = {
                 actionS.switchButton.prop('disabled', true);
 
                 mapModule.calculateRoute(mapS.origin, mapS.destination, mapModule.defineTravelMode(mapS.travelMode));
+
+                // check if there's any chartData
+                if (localStorage.getItem('chartData')) {
+                    // get data from localstorage
+                    var chartData = JSON.parse(localStorage.getItem('chartData'));
+
+                    // Update the graph with the data
+                    chartS.data.datasets[0].data = chartData.user;
+                    chartS.data.datasets[1].data = chartData.google;
+                    chartS.data.labels = chartData.labels;
+                    chartS.travelChart.update();
+                }
             }
             else {
                 // set driving as default mode
@@ -176,7 +204,12 @@ var actionS,
         // Handles everything when you add a traveltime
         actionS.addtimeButton.click(function(e) {
             e.preventDefault();
-            window.console.log("addtime pushed");
+            // Calculate time in minutes
+            var time = actionModule.getMinutes($('#day').val(), $('#hour').val(), $('#min').val());
+
+            // Get travel duration from Google Maps, display it and add it to the graph
+            var mapTime = $('#estimate').text();
+            chartModule.addChartData(mapTime, time, actionModule.formatDate(new Date()));
         });
     },
 
@@ -292,6 +325,7 @@ var mapS,
             }
         }
     },
+
     /**
     * Function used when an error occurs in the map
     * @param {boolean} browserHasGeolocation does the browser support geolocation
@@ -397,9 +431,9 @@ var mapS,
 */
 window.initMap = function() {
     mapModule.init();
+    chartModule.init();
     actionModule.init();
     storageModule.init();
-    chartModule.init();
 }
 
 /**
@@ -492,7 +526,7 @@ var chartS,
     * @param {string} label date
     * @returns {void}
     */
-    addGraphData: function(data1, data2, label) {
+    addChartData: function(data1, data2, label) {
         // Add data to graph
         chartS.travelChart.data.datasets[0].data.push(parseInt(data1));
         chartS.travelChart.data.datasets[1].data.push(parseInt(data2));
