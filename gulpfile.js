@@ -76,8 +76,6 @@ gulp.task("copy", function () {
     .pipe(gulp.dest(DEST + "/assets/fonts"))
     gulp.src(SRC + "/index.html")
     .pipe(gulp.dest(DEST));
-    gulp.src(SRC + "/distancematrix.php")
-    .pipe(gulp.dest(DEST + "/assets/"))
     gulp.src(SRC + "/jquery-ui-1.12.0.custom/**/*")
     .pipe(gulp.dest(DEST + "/assets/jquery-ui"))
 });
