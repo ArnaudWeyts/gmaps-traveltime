@@ -10,6 +10,7 @@
 window.initMap = function() {
     mapModule.init();
     chartModule.init();
+    imageModule.init();
     actionModule.init();
     storageModule.init();
 }
@@ -53,6 +54,15 @@ var storageModule = {
 
         // Write object to localstorage
         localStorage.setItem('chartData', JSON.stringify(chartData));
+    },
+
+    setImageData: function() {
+        var imageData = {
+            albumID: imageS.albumID,
+            albumHash: imageS.albumHash
+        }
+
+        localStorage.setItem('imageData', JSON.stringify(imageData));
     },
 
     /**
@@ -102,6 +112,14 @@ var storageModule = {
                     chartS.data.datasets[1].data = chartData.google;
                     chartS.data.labels = chartData.labels;
                     chartS.travelChart.update();
+                    imageS.chartImages.removeClass('hide');
+                }
+
+                if (localStorage.getItem('imageData')) {
+                    var imageData = JSON.parse(localStorage.getItem('imageData'));
+
+                    imageS.albumID = imageData.albumID;
+                    imageS.albumHash = imageData.albumHash;
                 }
             }
             else {
@@ -129,7 +147,8 @@ var actionS,
         allModes: $('input[name="radios"]'),
         submitButton: $('#search'),
         addtimeButton: $('#addtime'),
-        switchButton: $('#switch')
+        switchButton: $('#switch'),
+        saveButton: $('#saveimage')
     },
 
     init: function() {
@@ -213,6 +232,10 @@ var actionS,
             }
         });
 
+        actionS.addtimeButton.one("click", function() {
+            $('.chartimages').removeClass("hide");
+        });
+
         // Handles everything when you add a traveltime
         actionS.addtimeButton.click(function(e) {
             e.preventDefault();
@@ -224,6 +247,21 @@ var actionS,
             chartModule.addChartData(mapTime, time, actionModule.formatDate(new Date()));
 
             storageModule.setchartData();
+        });
+
+        actionS.saveButton.click(function(e) {
+            e.preventDefault();
+            while(!chartS.readyToSave) {
+                window.console.log("waiting");
+            }
+            var image = chartS.travelChart.toBase64Image();
+            if (!imageS.albumHash) {
+                imageModule.createAlbum();
+            }
+            imageModule.updateAlbum(imageModule.upload(image), imageS.albumHash);
+
+            // write the album variables to localstorage
+            storageModule.setImageData();
         });
     },
 
@@ -456,6 +494,7 @@ var chartS,
         Chart: require("chart.js"),
         ctx: $("#travelchart"),
         travelChart: null,
+        readyToSave: false,
         data: {
             labels: [],
             datasets: [
@@ -524,8 +563,16 @@ var chartS,
                     mode: 'label',
                     fontFamily: 'Roboto',
                     backgroundColor: 'rgba(42,42,42,1)'
+                },
+                animation: {
+                    onProgress: function() {
+                        chartS.readyToSave = false;
+                    },
+                    onComplete: function() {
+                        chartS.readyToSave = true;
+                    }
                 }
-            }
+            },
         });
     },
 
@@ -542,5 +589,73 @@ var chartS,
         chartS.travelChart.data.datasets[1].data.push(parseInt(data2));
         chartS.travelChart.data.labels.push(label);
         chartS.travelChart.update();
-    }
+    },
+}
+
+var imageS,
+    imageModule = {
+
+    settings: {
+        chartImages: $('#chartimages'),
+        albumHash: null,
+        albumID: null
+    },
+
+    init: function() {
+        imageS = this.settings;
+    },
+
+    upload: function(base64Image) {
+        var imgData = JSON.stringify(base64Image.replace(/^data:image\/(png|jpg);base64,/, ""));
+        var imageID = null;
+        $.ajax({
+            url: 'https://api.imgur.com/3/image',
+            headers: {
+                'Authorization': 'Client-ID 41ade810c7d2a5f'
+            },
+            async: false,
+            type: 'POST',
+            data: {
+                'image': imgData
+            },
+            success: function(result) {
+                imageID = result.data.id
+            }
+        });
+
+        return imageID;
+    },
+
+    createAlbum: function() {
+        $.ajax({
+            url: 'https://api.imgur.com/3/album',
+            headers: {
+                'Authorization': 'Client-ID 41ade810c7d2a5f'
+            },
+            type: 'POST',
+            data: {
+                title: "Your Graphs"
+            },
+            success: function(result) {
+                imageS.albumHash = result.data.deletehash;
+                imageS.albumID = result.data.id;
+            }
+        });
+    },
+
+    updateAlbum: function(imageID, albumHash) {
+        $.ajax({
+            url: 'https://api.imgur.com/3/album/' + albumHash + '/add',
+            headers: {
+                'Authorization': 'Client-ID 41ade810c7d2a5f'
+            },
+            type: 'POST',
+            data: {
+                ids: [imageID]
+            },
+            success: function(result) {
+                window.console.log(result);
+            }
+        });
+    },
 }
