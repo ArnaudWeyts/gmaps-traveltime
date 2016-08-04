@@ -218,6 +218,11 @@ input[type="radio"] {
     text-align: center;
 }
 
+.footer {
+    height: 10rem;
+    background-color: #43A047;
+}
+
 @media(max-width: 33rem) {
     #searchbar {
         label {
