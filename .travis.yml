@@ -1,0 +1,14 @@
+sudo: false
+language: node_js
+node_js:
+- '5.11'
+branches:
+  only:
+  - master
+install:
+- npm install
+script:
+- ./deploy.sh
+env:
+  global:
+    secure: L1/JM+gKKN1ALZRPuGJTGCcKuvwODj8UjcCXhKNCmRqUfJfOc5AVCrV2YNInDz1KG7ciqE8cetI7L+MpGQM+Q4YUb71NvOXFV3zqErjdX3+pCXkucfcqo40ZgizWrV7oBhGJODfg1QibucYPIdf/mB5PxZ3a+lfNpqQ8Fjs4W3UydUMpNK3Zhq0XyvtkyCx8kCDTBQVvQssgrlz4BAE+vbKWmPJqyT6itlmEYhWbU4wluQ9Yk6YNIIY6pvSmtn53eL3hcp3AlBzpfx2FksmMMMtv8O6meHbFo14S7WhHf9VNupvEGQI1gWMIjDrR7wC/ig+xoYPnNSkZn6jStVetOq/bX9Vd8ohqkX23sRfFqSKyAVF0Hx7N1VkXA5l1uKcYPPzufOl+Z2jmDSE1VOeCblD9ze8d1e3ku9Va/7d/8DhUI4+45RGJ7+iBRYqvl1XDLPf2Q755bghVT47p9cxmT4YBXAbojWgxaRZjy7Ay7S66bPlZRtpXhvk2a5tkErtFJ6VQm2gQCCs5JR6sXjB4FPzykpoO4o3RMppOHTseQQIMGIWCNj7sdvX7l56nz/Sqjt1yvhnm1U+/jhD5ToLE7rRt9kVR1W0bvNZguUKuoLhTi355D9Mf5HPxj2RbEJ51lOEfE6qEsOwVCq0jsKqj7nu9zJMuOuirj7wX7kAVKLA=
