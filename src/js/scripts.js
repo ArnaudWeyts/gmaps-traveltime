@@ -120,6 +120,8 @@ var storageModule = {
 
                     imageS.albumID = imageData.albumID;
                     imageS.albumHash = imageData.albumHash;
+
+                    imageModule.displayAllImages(imageModule.getAlbumImages(imageS.albumID));
                 }
             }
             else {
@@ -252,16 +254,23 @@ var actionS,
         actionS.saveButton.click(function(e) {
             e.preventDefault();
             while(!chartS.readyToSave) {
-                window.console.log("waiting");
+                window.console.log("waiting")
             }
+            // convert the chart to a base64Image string
             var image = chartS.travelChart.toBase64Image();
+            // check if an album already exists
             if (!imageS.albumHash) {
+                // create an album
                 imageModule.createAlbum();
             }
+            // add the image to the album
             imageModule.updateAlbum(imageModule.upload(image), imageS.albumHash);
 
             // write the album variables to localstorage
             storageModule.setImageData();
+
+            // get all of the albumimages
+            imageModule.getAlbumImages(imageS.albumID);
         });
     },
 
@@ -592,6 +601,9 @@ var chartS,
     },
 }
 
+/**
+* The image module handles all of the imgur api communication
+*/
 var imageS,
     imageModule = {
 
@@ -605,6 +617,11 @@ var imageS,
         imageS = this.settings;
     },
 
+    /**
+    * Handles an upload of a base64image
+    * @param {image} base64Image the image
+    * @returns {number} id the imgur id of the image
+    */
     upload: function(base64Image) {
         var imgData = JSON.stringify(base64Image.replace(/^data:image\/(png|jpg);base64,/, ""));
         var imageID = null;
@@ -626,6 +643,10 @@ var imageS,
         return imageID;
     },
 
+    /**
+    * Creates an album & sets the albumHash & albumID
+    * @returns {void}
+    */
     createAlbum: function() {
         $.ajax({
             url: 'https://api.imgur.com/3/album',
@@ -643,6 +664,12 @@ var imageS,
         });
     },
 
+    /**
+    * Adds an image to an album
+    * @param {number} imageID the imgur image id
+    * @param {number} albumHash the album deletehash
+    * @return {void}
+    */
     updateAlbum: function(imageID, albumHash) {
         $.ajax({
             url: 'https://api.imgur.com/3/album/' + albumHash + '/add',
@@ -652,10 +679,66 @@ var imageS,
             type: 'POST',
             data: {
                 ids: [imageID]
-            },
-            success: function(result) {
-                window.console.log(result);
             }
         });
     },
+
+    /**
+    * Deletes a given image from an albu
+    * @param {number} imageID the imgur image id
+    * @param {number} albumHash the album deletehash
+    * @returns {void}
+    */
+    deleteFromAlbum: function(imageID, albumHash) {
+        $.ajax({
+            url: 'https://api.imgur.com/3/album/' + albumHash + '/remove_images',
+            headers: {
+                'Authorization': 'Client-ID 41ade810c7d2a5f'
+            },
+            type: 'DELETE',
+            data: {
+                ids: [imageID]
+            }
+        });
+    },
+
+    /**
+    * Gets all the images for an album
+    * @param {number} albumID the imgur album id
+    * @returns {array} images all of the images
+    */
+    getAlbumImages: function(albumID) {
+        var images = null;
+        $.ajax({
+            url: 'https://api.imgur.com/3/album/' + albumID + '/images',
+            headers: {
+                'Authorization': 'Client-ID 41ade810c7d2a5f'
+            },
+            async: false,
+            type: 'GET',
+            success: function(result) {
+                images = result.data;
+            }
+        });
+
+        return images;
+    },
+
+    /**
+    * Displays all of the images in the html
+    * @param {array} images an array of images
+    * @returns {void}
+    */
+    displayAllImages: function(images) {
+        var parent = document.getElementById('chartimages');
+        images.forEach(function(entry) {
+            var link = document.createElement('a');
+            link.href = entry.link;
+            var img = document.createElement('img');
+            img.src = entry.link;
+            img.className = 'chart-img';
+            link.appendChild(img);
+            parent.appendChild(link);
+        })
+    }
 }

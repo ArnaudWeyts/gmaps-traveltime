@@ -1,83 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Gmaps Traveltime</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="theme-color" content="#2196F3">
-	<link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic,300' rel='stylesheet'>
-	<link rel="stylesheet" href="./assets/css/styles.min.css">
-	<link rel="stylesheet" href="./assets/jquery-ui/jquery-ui.min.css">
+    <title>Gmaps Traveltime</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2196F3">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic,300' rel='stylesheet'>
+    <link rel="stylesheet" href="./assets/css/styles.min.css">
+    <link rel="stylesheet" href="./assets/jquery-ui/jquery-ui.min.css">
 </head>
 <body>
-	<div id="dialog-confirm" title="Are you sure you want to edit?" style="display: none">
-    	<p>All of your traveltimes &amp; results will be deleted</p>
-	</div>
-	<header>
-		<h1>Gmaps Traveltime</h1>
-		<form>
-			<section id="searchbar">
-				<label for="origin"></label>
-				<input type="search" name="origin" id="origin" placeholder="Choose origin" disabled/>
-				<label for="destination"><a id="switch" class="unselect switchdest-button" disabled><i id="switchIcon" class="icon-swap"></i></a></label>
-				<input type="search" name="destination" id="destination" placeholder="Choose destination" disabled/>
-			</section>
-			<section id="modeselect">
-				<label for="driving">
-					<input type="radio" name="radios" id="driving" disabled/>
-					<span class="unselect">
-						<i class="align-icon icon-car"></i>
-					</span>
-				</label>
-				<label for="bicycling">
-					<input type="radio" name="radios" id="bicycling" disabled/>
-					<span class="unselect">
-						<i class="align-icon icon-bike"></i>
-					</span>
-				</label>
-				<label for="walking">
-					<input type="radio" name="radios" id="walking" disabled/>
-					<span class="unselect">
-						<i class="align-icon icon-walk"></i>
-					</span>
-				</label>
-			</section>
-			<label for="submit"></label>
-			<input class="search-btn" id="search" type="submit" value="Search">
-		</form>
-	</header>
-	<div id="content">
-		<div class="center-text">
-			<div class="map" id="map"></div>
-			<div class="center-block">
-				<p class="estimate">Google's estimate: <span id="estimate"></span></p>
-			</div>
-			<div class="center-block hide duration-input">
-				<p>Enter your own traveltime:</p>
-				<label for="days"></label>
-				<input class="material-input_number" id="days" type="number" name="days" min="0" placeholder="days">
-				<label for="hours"></label>
-				<input class="material-input_number" id="hours" type="number" name="hours" min="0" max="24" placeholder="hours">
-				<label for="minutes"></label>
-				<input class="material-input_number"  id="minutes" type="number" name="minutes" min="0" max="60" placeholder="minutes">
-				<label for="addtime"></label>
-				<input class="addtime-btn" id="addtime" type="submit" value="Add" name="addtime">
-			</div>
-		</div>
-		<section class="graph hide">
-			<h2 class="title">Graph</h2>
-			<canvas id="travelchart" class="travelchart"></canvas>
-		</section>
-		<section class="chartimages hide" id="chartimages">
-			<label for="saveimage"></label>
-			<input class="saveimage-btn" id="saveimage" type="submit" value="Save" name="saveimage">
-			<h2 class="title">Saved graphs</h2>
-		</section>
-	</div>
-	<script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
-	<script   src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"   integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="   crossorigin="anonymous"></script>
-	<script src="./assets/js/main.min.js"></script>
-	<script
+    <div id="dialog-confirm" title="Are you sure you want to edit?" style="display: none">
+        <p>All of your traveltimes &amp; results will be deleted</p>
+    </div>
+    <header>
+        <h1>Gmaps Traveltime</h1>
+        <form>
+            <section id="searchbar">
+                <label for="origin"></label>
+                <input type="search" name="origin" id="origin" placeholder="Choose origin" disabled/>
+                <label for="destination"><a id="switch" class="unselect switchdest-button" disabled><i id="switchIcon" class="icon-swap"></i></a></label>
+                <input type="search" name="destination" id="destination" placeholder="Choose destination" disabled/>
+            </section>
+            <section id="modeselect">
+                <label for="driving">
+                    <input type="radio" name="radios" id="driving" disabled/>
+                    <span class="unselect">
+                        <i class="align-icon icon-car"></i>
+                    </span>
+                </label>
+                <label for="bicycling">
+                    <input type="radio" name="radios" id="bicycling" disabled/>
+                    <span class="unselect">
+                        <i class="align-icon icon-bike"></i>
+                    </span>
+                </label>
+                <label for="walking">
+                    <input type="radio" name="radios" id="walking" disabled/>
+                    <span class="unselect">
+                        <i class="align-icon icon-walk"></i>
+                    </span>
+                </label>
+            </section>
+            <label for="submit"></label>
+            <input class="search-btn" id="search" type="submit" value="Search">
+        </form>
+    </header>
+    <div id="content">
+        <div class="center-text">
+            <div class="map" id="map"></div>
+            <div class="center-block">
+                <p class="estimate">Google's estimate: <span id="estimate"></span></p>
+            </div>
+            <div class="center-block hide duration-input">
+                <p>Enter your own traveltime:</p>
+                <label for="days"></label>
+                <input class="material-input_number" id="days" type="number" name="days" min="0" placeholder="days">
+                <label for="hours"></label>
+                <input class="material-input_number" id="hours" type="number" name="hours" min="0" max="24" placeholder="hours">
+                <label for="minutes"></label>
+                <input class="material-input_number"  id="minutes" type="number" name="minutes" min="0" max="60" placeholder="minutes">
+                <label for="addtime"></label>
+                <input class="addtime-btn" id="addtime" type="submit" value="Add" name="addtime">
+            </div>
+        </div>
+        <section class="graph hide">
+            <h2 class="title">Graph</h2>
+            <canvas id="travelchart" class="travelchart"></canvas>
+        </section>
+        <section class="chartimages hide" id="chartimages">
+            <label for="saveimage"></label>
+            <input class="saveimage-btn" id="saveimage" type="submit" value="Save" name="saveimage">
+            <h2 class="title">Saved graphs</h2>
+        </section>
+    </div>
+    <script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
+    <script   src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"   integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="   crossorigin="anonymous"></script>
+    <script src="./assets/js/main.min.js"></script>
+    <script
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDW9Fdp-9aH2IYuhIOsQBG4BR9gLpLa_oM&amp;libraries=places&amp;callback=initMap" async defer>
     </script>
     <footer class="footer">
