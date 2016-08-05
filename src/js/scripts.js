@@ -732,13 +732,18 @@ var imageS,
     displayAllImages: function(images) {
         var parent = document.getElementById('chartimages');
         images.forEach(function(entry) {
-            var link = document.createElement('a');
-            link.href = entry.link;
+            var div = document.createElement('div');
+            div.className = 'image-container'
             var img = document.createElement('img');
             img.src = entry.link;
             img.className = 'chart-img';
-            link.appendChild(img);
-            parent.appendChild(link);
+            div.appendChild(img);
+            var openImage = document.createElement('a');
+            openImage.href = entry.link;
+            openImage.className = 'material-btn gallery-btn';
+            openImage.textContent = "Open";
+            div.appendChild(openImage);
+            parent.appendChild(div);
         })
     }
 }

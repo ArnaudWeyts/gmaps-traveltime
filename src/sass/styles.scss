@@ -89,7 +89,8 @@ input[type="search"], input[type="number"] {
     border-bottom: 2px #2E7D32 solid;
     color: #FFF;
 }
-input[type="submit"] {
+
+.material-btn {
     &:focus {
         outline: none;
         border: 1px solid #fff;
@@ -104,6 +105,13 @@ input[type="submit"] {
     font-size: 1.6rem;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
+
+.gallery-btn {
+    padding: 1rem;
+    text-decoration: none;
+    display: block;
+}
+
 .search-btn {
     margin-top: 2rem;
 }
@@ -219,7 +227,12 @@ input[type="radio"] {
 }
 
 .chart-img {
+    width: 100%;
+}
+
+.image-container {
     width: 50%;
+    display: inline-block;
 }
 
 .footer {
