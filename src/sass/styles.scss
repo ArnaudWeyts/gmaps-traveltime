@@ -99,7 +99,7 @@ input[type="search"], input[type="number"] {
     color: #fff;
     background-color: #2E7D32;
     width: 12rem;
-    height: 3.2rem;
+    padding: 0.8rem;
     border: 1px solid #2E7D32;
     border-radius: 2px;
     font-size: 1.6rem;
@@ -107,9 +107,9 @@ input[type="search"], input[type="number"] {
 }
 
 .gallery-btn {
-    padding: 1rem;
     text-decoration: none;
-    display: block;
+    display: inline-block;
+    margin: 1rem;
 }
 
 .search-btn {
@@ -231,7 +231,8 @@ input[type="radio"] {
 }
 
 .image-container {
-    width: 50%;
+    width: 46%;
+    margin: 2rem 1%;
     display: inline-block;
 }
 
