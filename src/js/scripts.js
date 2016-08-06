@@ -62,6 +62,8 @@ var storageModule = {
             albumHash: imageS.albumHash
         }
 
+        window.console.log(imageData);
+
         localStorage.setItem('imageData', JSON.stringify(imageData));
     },
 
@@ -114,20 +116,22 @@ var storageModule = {
                     chartS.travelChart.update();
                     imageS.chartImages.removeClass('hide');
                 }
-
-                if (localStorage.getItem('imageData')) {
-                    var imageData = JSON.parse(localStorage.getItem('imageData'));
-
-                    imageS.albumID = imageData.albumID;
-                    imageS.albumHash = imageData.albumHash;
-
-                    imageModule.displayAllImages(imageModule.getAlbumImages(imageS.albumID));
-                }
             }
             else {
                 // set all the inputs to default
                 actionModule.toggleInputs(false);
                 $('#driving').prop('checked', true);
+            }
+
+            if (localStorage.getItem('imageData')) {
+                var imageData = JSON.parse(localStorage.getItem('imageData'));
+
+                imageS.albumID = imageData.albumID;
+                imageS.albumHash = imageData.albumHash;
+
+                imageModule.displayAllImages(imageModule.getAlbumImages(imageS.albumID));
+
+                actionModule.updateUIActions();
             }
         }
         else {
@@ -150,7 +154,8 @@ var actionS,
         submitButton: $('#search'),
         addtimeButton: $('#addtime'),
         switchButton: $('#switch'),
-        saveButton: $('#saveimage')
+        saveButton: $('#saveimage'),
+        deleteButton: $('.delete-btn')
     },
 
     init: function() {
@@ -258,8 +263,9 @@ var actionS,
             }
             // convert the chart to a base64Image string
             var image = chartS.travelChart.toBase64Image();
+
             // check if an album already exists
-            if (!imageS.albumHash) {
+            if (imageS.albumHash === null) {
                 // create an album
                 imageModule.createAlbum();
             }
@@ -269,8 +275,19 @@ var actionS,
             // write the album variables to localstorage
             storageModule.setImageData();
 
-            // get all of the albumimages
-            imageModule.getAlbumImages(imageS.albumID);
+            // display all the albumimages -> better would be to just add the image that was uploaded
+            imageModule.displayAllImages(imageModule.getAlbumImages(imageS.albumID));
+        });
+    },
+
+    updateUIActions: function() {
+        actionS.deleteButton = $('.delete-btn');
+        actionS.deleteButton.click(function(e) {
+            e.preventDefault();
+
+            imageModule.deleteFromAlbum(this.id, imageS.albumHash);
+
+            // loop over elements and dynamically remove element with this id
         });
     },
 
@@ -625,6 +642,7 @@ var imageS,
     upload: function(base64Image) {
         var imgData = JSON.stringify(base64Image.replace(/^data:image\/(png|jpg);base64,/, ""));
         var imageID = null;
+        window.console.log("Uploading image...")
         $.ajax({
             url: 'https://api.imgur.com/3/image',
             headers: {
@@ -636,6 +654,7 @@ var imageS,
                 'image': imgData
             },
             success: function(result) {
+                window.console.log("Image uploaded: " + result);
                 imageID = result.data.id
             }
         });
@@ -648,16 +667,19 @@ var imageS,
     * @returns {void}
     */
     createAlbum: function() {
+        window.console.log("Creating album...")
         $.ajax({
             url: 'https://api.imgur.com/3/album',
             headers: {
                 'Authorization': 'Client-ID 41ade810c7d2a5f'
             },
             type: 'POST',
+            async: false,
             data: {
                 title: "Your Graphs"
             },
             success: function(result) {
+                window.console.log("Album created: " + result);
                 imageS.albumHash = result.data.deletehash;
                 imageS.albumID = result.data.id;
             }
@@ -671,12 +693,14 @@ var imageS,
     * @return {void}
     */
     updateAlbum: function(imageID, albumHash) {
+        window.console.log("Updating album using " + imageID + " and " + albumHash);
         $.ajax({
             url: 'https://api.imgur.com/3/album/' + albumHash + '/add',
             headers: {
                 'Authorization': 'Client-ID 41ade810c7d2a5f'
             },
-            type: 'POST',
+            type: 'PUT',
+            async: false,
             data: {
                 ids: [imageID]
             }
@@ -691,13 +715,14 @@ var imageS,
     */
     deleteFromAlbum: function(imageID, albumHash) {
         $.ajax({
-            url: 'https://api.imgur.com/3/album/' + albumHash + '/remove_images',
+            url: 'https://api.imgur.com/3/album/' + albumHash + '/remove_images/?ids=' + imageID,
             headers: {
                 'Authorization': 'Client-ID 41ade810c7d2a5f'
             },
             type: 'DELETE',
-            data: {
-                ids: [imageID]
+            success: function(result) {
+                window.console.log(imageS.albumID);
+                window.console.log(result);
             }
         });
     },
@@ -708,6 +733,7 @@ var imageS,
     * @returns {array} images all of the images
     */
     getAlbumImages: function(albumID) {
+        window.console.log("Getting all album images using " + albumID);
         var images = null;
         $.ajax({
             url: 'https://api.imgur.com/3/album/' + albumID + '/images',
@@ -741,8 +767,13 @@ var imageS,
             var openImage = document.createElement('a');
             openImage.href = entry.link;
             openImage.className = 'material-btn gallery-btn';
-            openImage.textContent = "Open";
+            openImage.textContent = "Download";
+            var deleteImage = document.createElement('a');
+            deleteImage.id = entry.id;
+            deleteImage.className = 'material-btn gallery-btn delete-btn';
+            deleteImage.textContent = "Delete";
             div.appendChild(openImage);
+            div.appendChild(deleteImage);
             parent.appendChild(div);
         })
     }
