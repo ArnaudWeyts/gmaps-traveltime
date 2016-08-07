@@ -42,6 +42,14 @@ var storageModule = {
     },
 
     /**
+    * Clears all the traveldata from localstorage
+    * @returns {void}
+    */
+    clearTravelData: function() {
+        localStorage.removeItem('travelData');
+    },
+
+    /**
     * Function to set graph data in local storage
     * @returns {void}
     */
@@ -56,10 +64,19 @@ var storageModule = {
         localStorage.setItem('chartData', JSON.stringify(chartData));
     },
 
+    /**
+    * Clears all of the chartdata from localstorage
+    * @returns {void}
+    */
+    clearChartData: function() {
+        localStorage.removeItem('chartData');
+    },
+
     setImageData: function() {
         var imageData = {
             albumID: imageS.albumID,
-            albumHash: imageS.albumHash
+            albumHash: imageS.albumHash,
+            imageIDs: imageS.imageIDs
         }
 
         window.console.log(imageData);
@@ -114,7 +131,6 @@ var storageModule = {
                     chartS.data.datasets[1].data = chartData.google;
                     chartS.data.labels = chartData.labels;
                     chartS.travelChart.update();
-                    imageS.chartImages.removeClass('hide');
                 }
             }
             else {
@@ -130,6 +146,8 @@ var storageModule = {
                 imageS.albumHash = imageData.albumHash;
 
                 imageModule.displayAllImages(imageModule.getAlbumImages(imageS.albumID));
+
+                imageS.chartImages.removeClass('hide');
 
                 actionModule.updateUIActions();
             }
@@ -217,7 +235,8 @@ var actionS,
                             // enable the inputs again
                             actionModule.toggleInputs(false);
                             // clear localstorage
-                            localStorage.clear();
+                            storageModule.clearTravelData();
+                            storageModule.clearChartData();
                         },
                         Cancel: function() {
                             $(this).dialog( "close" );
@@ -284,10 +303,15 @@ var actionS,
         actionS.deleteButton = $('.delete-btn');
         actionS.deleteButton.click(function(e) {
             e.preventDefault();
+            // get the node to be deleted
+            var imageNode = this.parentNode;
+            // get its parent
+            var parent = imageNode.parentNode;
+            // delete the node using the parent
+            parent.removeChild(imageNode);
 
+            // delete from the imgur album
             imageModule.deleteFromAlbum(this.id, imageS.albumHash);
-
-            // loop over elements and dynamically remove element with this id
         });
     },
 
@@ -627,7 +651,8 @@ var imageS,
     settings: {
         chartImages: $('#chartimages'),
         albumHash: null,
-        albumID: null
+        albumID: null,
+        imageIDs: []
     },
 
     init: function() {
@@ -655,7 +680,8 @@ var imageS,
             },
             success: function(result) {
                 window.console.log("Image uploaded: " + result);
-                imageID = result.data.id
+                imageID = result.data.id;
+                imageS.imageIDs.push(imageID);
             }
         });
 
@@ -748,6 +774,32 @@ var imageS,
         });
 
         return images;
+    },
+
+    /**
+    * Adds a single image to the layout
+    * @param {object} image the image object
+    * @returns {void}
+    */
+    addSingleImage: function(image) {
+        var parent = document.getElementById('chartimages');
+        var div = document.createElement('div');
+        div.className = 'image-container'
+        var img = document.createElement('img');
+        img.src = image.link;
+        img.className = 'chart-img';
+        div.appendChild(img);
+        var openImage = document.createElement('a');
+        openImage.href = image.link;
+        openImage.className = 'material-btn gallery-btn';
+        openImage.textContent = "Download";
+        var deleteImage = document.createElement('a');
+        deleteImage.id = image.id;
+        deleteImage.className = 'material-btn gallery-btn delete-btn';
+        deleteImage.textContent = "Delete";
+        div.appendChild(openImage);
+        div.appendChild(deleteImage);
+        parent.appendChild(div);
     },
 
     /**
