@@ -241,13 +241,28 @@ input[type="radio"] {
     background-color: #43A047;
 }
 
+@media(max-width: 70rem) {
+    .image-container {
+        width: 98%;
+        margin: 2rem 1%;
+        display: block;
+    }
+
+    .addtime-btn {
+        display: inline-block;
+        margin: 1rem;
+    }
+}
+
 @media(max-width: 33rem) {
     #searchbar {
         label {
             display: block;
         }
     }
-    .icon-swap {
+    .icon-swap:before {
+        margin: 1rem;
+        display: inline-block;
         transform: rotate(-90deg);
     }
 }
