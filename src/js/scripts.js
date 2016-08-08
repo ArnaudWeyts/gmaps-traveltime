@@ -144,10 +144,15 @@ var storageModule = {
 
                 imageS.albumID = imageData.albumID;
                 imageS.albumHash = imageData.albumHash;
+                imageS.imageIDs = imageData.imageIDs;
 
-                imageModule.displayAllImages(imageModule.getAlbumImages(imageS.albumID));
+                imageModule.displayAllImages(imageModule.getAllImages(imageS.imageIDs));
 
                 imageS.chartImages.removeClass('hide');
+
+                if (imageS.imageIDs.length !== 0) {
+                    $('#nograph-msg').hide();
+                }
 
                 actionModule.updateUIActions();
             }
@@ -291,11 +296,13 @@ var actionS,
             // add the image to the album
             imageModule.updateAlbum(imageModule.upload(image), imageS.albumHash);
 
+            $('#nograph-msg').hide();
+
             // write the album variables to localstorage
             storageModule.setImageData();
 
             // display all the albumimages -> better would be to just add the image that was uploaded
-            imageModule.displayAllImages(imageModule.getAlbumImages(imageS.albumID));
+            imageModule.displayAllImages(imageModule.getAllImages(imageS.imageIDs));
         });
     },
 
@@ -734,7 +741,7 @@ var imageS,
     },
 
     /**
-    * Deletes a given image from an albu
+    * Deletes a given image from an album
     * @param {number} imageID the imgur image id
     * @param {number} albumHash the album deletehash
     * @returns {void}
@@ -746,15 +753,25 @@ var imageS,
                 'Authorization': 'Client-ID 41ade810c7d2a5f'
             },
             type: 'DELETE',
-            success: function(result) {
-                window.console.log(imageS.albumID);
-                window.console.log(result);
+            success: function() {
+                // delete the id from the array
+                var index = imageS.imageIDs.indexOf(imageID);
+                imageS.imageIDs.splice(index, 1);
+
+                if (imageS.imageIDs.length === 0) {
+                    $('#nograph-msg').show();
+                }
+
+                // rewrite to localstorage
+                storageModule.setImageData();
             }
         });
     },
 
     /**
-    * Gets all the images for an album
+    * Gets all the images for an album using the imgur API.
+    * This is useful, but it's better to load the images using the saved ID's
+    * in localstorage.
     * @param {number} albumID the imgur album id
     * @returns {array} images all of the images
     */
@@ -772,6 +789,30 @@ var imageS,
                 images = result.data;
             }
         });
+
+        return images;
+    },
+
+    /**
+    * Gets all the images using the localstorage ID's
+    * @param {array} imageIDs the image IDs
+    * @returns {array} images all of the images
+    */
+    getAllImages: function(imageIDs) {
+        var images = [];
+        for (var i = imageIDs.length - 1; i >= 0; i--) {
+            $.ajax({
+                url: 'https://api.imgur.com/3/image/' + imageIDs[i],
+                headers: {
+                    'Authorization': 'Client-ID 41ade810c7d2a5f'
+                },
+                async: false,
+                type: 'GET',
+                success: function(result) {
+                    images.push(result.data);
+                }
+            });
+        }
 
         return images;
     },
@@ -828,5 +869,6 @@ var imageS,
             div.appendChild(deleteImage);
             parent.appendChild(div);
         })
+        actionModule.updateUIActions();
     }
 }

@@ -118,6 +118,9 @@ input[type="search"], input[type="number"] {
 .addtime-btn {
     margin-left: 1rem;
 }
+.saveimage-btn {
+    margin-top: 2rem;
+}
 input[type="text"], input[type="number"] {
     &::-ms-clear {
         display: none;
@@ -218,6 +221,7 @@ input[type="radio"] {
 .graph {
     width: 90%;
     margin: 2rem auto;
+    text-align: center;
 }
 
 .chartimages {
@@ -234,6 +238,12 @@ input[type="radio"] {
     width: 46%;
     margin: 2rem 1%;
     display: inline-block;
+}
+
+.nograph-msg {
+    text-align: left;
+    font-size: 1.5rem;
+    margin-left: 1rem;
 }
 
 .footer {
