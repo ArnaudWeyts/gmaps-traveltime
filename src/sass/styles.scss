@@ -23,6 +23,9 @@ body {
     -ms-user-select: none;
     user-select: none;
 }
+.no-linkstyle {
+    text-decoration: none;
+}
 header {
     width: 100%;
     background-color: #43A047;
@@ -241,14 +244,44 @@ input[type="radio"] {
 }
 
 .nograph-msg {
-    text-align: left;
-    font-size: 1.5rem;
-    margin-left: 1rem;
+    font-size: 2.5rem;
+}
+
+.reminder-msg {
+    font-size: 1.8rem;
 }
 
 .footer {
-    height: 10rem;
     background-color: #43A047;
+    color: #FFF;
+    height: 10rem;
+
+    .footer-content {
+        width: 90%;
+        margin: 0 auto;
+        height: 100%;
+        display:table;
+
+        .footer-content_madeby {
+            padding-left: 1rem;
+            font-size: 1.3rem;
+            display:table-cell;
+            vertical-align: middle;
+        }
+
+        .footer-content_github {
+            padding-right: 1rem;
+            font-size: 1.3rem;
+            display:table-cell;
+            vertical-align: middle;
+            text-align: right;
+
+            .icon-github {
+                font-size: 3rem;
+                color: #FFF;
+            }
+        }
+    }
 }
 
 @media(max-width: 70rem) {
