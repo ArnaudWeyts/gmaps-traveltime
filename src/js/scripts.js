@@ -131,6 +131,8 @@ var storageModule = {
                     chartS.data.datasets[1].data = chartData.google;
                     chartS.data.labels = chartData.labels;
                     chartS.travelChart.update();
+
+                    imageS.chartImages.removeClass('hide');
                 }
             }
             else {
@@ -147,8 +149,6 @@ var storageModule = {
                 imageS.imageIDs = imageData.imageIDs;
 
                 imageModule.displayAllImages(imageModule.getAllImages(imageS.imageIDs));
-
-                imageS.chartImages.removeClass('hide');
 
                 if (imageS.imageIDs.length !== 0) {
                     $('#nograph-msg').hide();
@@ -870,6 +870,9 @@ var imageS,
         div.appendChild(openImage);
         div.appendChild(deleteImage);
         parent.appendChild(div);
+
+        // update the buttons
+        actionModule.updateUIActions();
     },
 
     /**
