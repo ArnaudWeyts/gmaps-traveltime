@@ -263,6 +263,7 @@ var actionS,
             }
         });
 
+        // show chartimages
         actionS.addtimeButton.one("click", function() {
             $('.chartimages').removeClass("hide");
         });
@@ -280,10 +281,15 @@ var actionS,
             storageModule.setchartData();
         });
 
+        // hide the message when save is clicked the first time
+        actionS.saveButton.one("click", function() {
+            $('#nograph-msg').hide();
+        });
+
         actionS.saveButton.click(function(e) {
             e.preventDefault();
             while(!chartS.readyToSave) {
-                window.console.log("waiting")
+                //window.console.log("waiting")
             }
             // convert the chart to a base64Image string
             var image = chartS.travelChart.toBase64Image();
@@ -293,16 +299,18 @@ var actionS,
                 // create an album
                 imageModule.createAlbum();
             }
-            // add the image to the album
-            imageModule.updateAlbum(imageModule.upload(image), imageS.albumHash);
 
-            $('#nograph-msg').hide();
+            // upload the image and save the id
+            var imageID = imageModule.upload(image);
+
+            // add the image to the album
+            imageModule.updateAlbum(imageID, imageS.albumHash);
 
             // write the album variables to localstorage
             storageModule.setImageData();
 
-            // display all the albumimages -> better would be to just add the image that was uploaded
-            imageModule.displayAllImages(imageModule.getAllImages(imageS.imageIDs));
+            // display the image that was just uploaded
+            imageModule.displaySingleImage(imageModule.getSingleImage(imageID));
         });
     },
 
@@ -611,7 +619,6 @@ var chartS,
                             fontStyle: 'bold'
                         },
                         ticks: {
-                            beginAtZero: true,
                             fontFamily: 'Roboto'
                         }
                     }],
@@ -674,7 +681,7 @@ var imageS,
     upload: function(base64Image) {
         var imgData = JSON.stringify(base64Image.replace(/^data:image\/(png|jpg);base64,/, ""));
         var imageID = null;
-        window.console.log("Uploading image...")
+        //window.console.log("Uploading image...")
         $.ajax({
             url: 'https://api.imgur.com/3/image',
             headers: {
@@ -686,7 +693,7 @@ var imageS,
                 'image': imgData
             },
             success: function(result) {
-                window.console.log("Image uploaded: " + result);
+                //window.console.log("Image uploaded: " + result);
                 imageID = result.data.id;
                 imageS.imageIDs.push(imageID);
             }
@@ -700,7 +707,7 @@ var imageS,
     * @returns {void}
     */
     createAlbum: function() {
-        window.console.log("Creating album...")
+        //window.console.log("Creating album...")
         $.ajax({
             url: 'https://api.imgur.com/3/album',
             headers: {
@@ -712,7 +719,7 @@ var imageS,
                 title: "Your Graphs"
             },
             success: function(result) {
-                window.console.log("Album created: " + result);
+                //window.console.log("Album created: " + result);
                 imageS.albumHash = result.data.deletehash;
                 imageS.albumID = result.data.id;
             }
@@ -726,7 +733,7 @@ var imageS,
     * @return {void}
     */
     updateAlbum: function(imageID, albumHash) {
-        window.console.log("Updating album using " + imageID + " and " + albumHash);
+        //window.console.log("Updating album using " + imageID + " and " + albumHash);
         $.ajax({
             url: 'https://api.imgur.com/3/album/' + albumHash + '/add',
             headers: {
@@ -776,7 +783,7 @@ var imageS,
     * @returns {array} images all of the images
     */
     getAlbumImages: function(albumID) {
-        window.console.log("Getting all album images using " + albumID);
+        //window.console.log("Getting all album images using " + albumID);
         var images = null;
         $.ajax({
             url: 'https://api.imgur.com/3/album/' + albumID + '/images',
@@ -818,11 +825,33 @@ var imageS,
     },
 
     /**
+    * Gets a single image using an ID
+    * @param {number} imageID the imgur image id
+    * @return {object} image the image object
+    */
+    getSingleImage: function(imageID) {
+        var image;
+        $.ajax({
+            url: 'https://api.imgur.com/3/image/' + imageID,
+            headers: {
+                'Authorization': 'Client-ID 41ade810c7d2a5f'
+            },
+            async: false,
+            type: 'GET',
+            success: function(result) {
+                image = result.data;
+            }
+        });
+
+        return image;
+    },
+
+    /**
     * Adds a single image to the layout
     * @param {object} image the image object
     * @returns {void}
     */
-    addSingleImage: function(image) {
+    displaySingleImage: function(image) {
         var parent = document.getElementById('chartimages');
         var div = document.createElement('div');
         div.className = 'image-container'
