@@ -79,8 +79,6 @@ var storageModule = {
             imageIDs: imageS.imageIDs
         }
 
-        window.console.log(imageData);
-
         localStorage.setItem('imageData', JSON.stringify(imageData));
     },
 
@@ -144,17 +142,23 @@ var storageModule = {
             if (localStorage.getItem('imageData')) {
                 var imageData = JSON.parse(localStorage.getItem('imageData'));
 
+                imageS.chartImages.removeClass('hide');
+
                 imageS.albumID = imageData.albumID;
                 imageS.albumHash = imageData.albumHash;
                 imageS.imageIDs = imageData.imageIDs;
-
-                imageModule.displayAllImages(imageModule.getAllImages(imageS.imageIDs));
 
                 if (imageS.imageIDs.length !== 0) {
                     $('#nograph-msg').hide();
                 }
 
-                actionModule.updateUIActions();
+                imageModule.displayAllImages(imageModule.getAllImages(imageS.imageIDs));
+            }
+            // show some example images if none were saved
+            else {
+                $('#nograph-msg').hide();
+
+                imageModule.displaySampleImages();
             }
         }
         else {
@@ -239,6 +243,20 @@ var actionS,
                             $(this).dialog( "close" );
                             // enable the inputs again
                             actionModule.toggleInputs(false);
+
+                            // clear directions
+                            mapS.directionsDisplay.setMap(null);
+
+                            // clear graph
+                            chartS.travelChart.data.datasets[0].data = [];
+                            chartS.travelChart.data.datasets[1].data = [];
+                            chartS.travelChart.update();
+
+                            $('#estimate').hide();
+                            $('.estimate').hide();
+                            $('.duration-input').hide();
+                            $('.graph').hide();
+
                             // clear localstorage
                             storageModule.clearTravelData();
                             storageModule.clearChartData();
@@ -300,8 +318,9 @@ var actionS,
                 imageModule.createAlbum();
             }
 
+            var title = mapS.origin + " to " + mapS.destination + " (" + mapS.travelMode + ")";
             // upload the image and save the id
-            var imageID = imageModule.upload(image);
+            var imageID = imageModule.upload(image, title);
 
             // add the image to the album
             imageModule.updateAlbum(imageID, imageS.albumHash);
@@ -311,6 +330,8 @@ var actionS,
 
             // display the image that was just uploaded
             imageModule.displaySingleImage(imageModule.getSingleImage(imageID));
+
+            imageModule.removeSampleImages();
         });
     },
 
@@ -320,13 +341,17 @@ var actionS,
             e.preventDefault();
             // get the node to be deleted
             var imageNode = this.parentNode;
+
             // get its parent
             var parent = imageNode.parentNode;
+
             // delete the node using the parent
             parent.removeChild(imageNode);
 
             // delete from the imgur album
-            imageModule.deleteFromAlbum(this.id, imageS.albumHash);
+            if (this.id !== '') {
+                imageModule.deleteFromAlbum(this.id, imageS.albumHash);
+            }
         });
     },
 
@@ -510,6 +535,7 @@ var mapS,
                         //var distance = element.distance.text;
                         var duration = element.duration.text;
                         $('#estimate').text(duration);
+                        $('#estimate').show();
                         $('.estimate').css('display', 'inline-block');
                         $('.duration-input').css('display', 'inline-block');
                         $('.graph').show();
@@ -676,12 +702,12 @@ var imageS,
     /**
     * Handles an upload of a base64image
     * @param {image} base64Image the image
+    * @param {string} title the title, aka the origin, destination & mode
     * @returns {number} id the imgur id of the image
     */
-    upload: function(base64Image) {
+    upload: function(base64Image, title) {
         var imgData = JSON.stringify(base64Image.replace(/^data:image\/(png|jpg);base64,/, ""));
         var imageID = null;
-        //window.console.log("Uploading image...")
         $.ajax({
             url: 'https://api.imgur.com/3/image',
             headers: {
@@ -690,10 +716,10 @@ var imageS,
             async: false,
             type: 'POST',
             data: {
-                'image': imgData
+                'image': imgData,
+                'title': title
             },
             success: function(result) {
-                //window.console.log("Image uploaded: " + result);
                 imageID = result.data.id;
                 imageS.imageIDs.push(imageID);
             }
@@ -707,7 +733,6 @@ var imageS,
     * @returns {void}
     */
     createAlbum: function() {
-        //window.console.log("Creating album...")
         $.ajax({
             url: 'https://api.imgur.com/3/album',
             headers: {
@@ -719,7 +744,6 @@ var imageS,
                 title: "Your Graphs"
             },
             success: function(result) {
-                //window.console.log("Album created: " + result);
                 imageS.albumHash = result.data.deletehash;
                 imageS.albumID = result.data.id;
             }
@@ -733,7 +757,6 @@ var imageS,
     * @return {void}
     */
     updateAlbum: function(imageID, albumHash) {
-        //window.console.log("Updating album using " + imageID + " and " + albumHash);
         $.ajax({
             url: 'https://api.imgur.com/3/album/' + albumHash + '/add',
             headers: {
@@ -783,7 +806,6 @@ var imageS,
     * @returns {array} images all of the images
     */
     getAlbumImages: function(albumID) {
-        //window.console.log("Getting all album images using " + albumID);
         var images = null;
         $.ajax({
             url: 'https://api.imgur.com/3/album/' + albumID + '/images',
@@ -854,7 +876,10 @@ var imageS,
     displaySingleImage: function(image) {
         var parent = document.getElementById('chartimages');
         var div = document.createElement('div');
-        div.className = 'image-container'
+        div.className = 'image-container';
+        var title = document.createElement('h2');
+        title.textContent = image.title;
+        div.appendChild(title);
         var img = document.createElement('img');
         img.src = image.link;
         img.className = 'chart-img';
@@ -885,6 +910,9 @@ var imageS,
         images.forEach(function(entry) {
             var div = document.createElement('div');
             div.className = 'image-container'
+            var title = document.createElement('h2');
+            title.textContent = entry.title;
+            div.appendChild(title);
             var img = document.createElement('img');
             img.src = entry.link;
             img.className = 'chart-img';
@@ -902,5 +930,45 @@ var imageS,
             parent.appendChild(div);
         })
         actionModule.updateUIActions();
+    },
+
+    displaySampleImages: function() {
+        var imageIDs = ['k02OrG2', 'yXirSfe', 'fq7dKKU'];
+        var images = this.getAllImages(imageIDs);
+        var parent = document.getElementById('chartimages');
+        images.forEach(function(entry) {
+            var div = document.createElement('div');
+            div.className = 'image-container'
+            div.id = entry.id;
+            var title = document.createElement('h2');
+            title.textContent = entry.title;
+            div.appendChild(title);
+            var img = document.createElement('img');
+            img.src = entry.link;
+            img.className = 'chart-img';
+            div.appendChild(img);
+            var openImage = document.createElement('a');
+            openImage.href = entry.link;
+            openImage.className = 'material-btn gallery-btn';
+            openImage.textContent = "Download";
+            var deleteImage = document.createElement('a');
+            deleteImage.className = 'material-btn gallery-btn delete-btn';
+            deleteImage.textContent = "Delete";
+            div.appendChild(openImage);
+            div.appendChild(deleteImage);
+            parent.appendChild(div);
+        })
+        actionModule.updateUIActions();
+    },
+
+    removeSampleImages: function() {
+        var imageIDs = ['k02OrG2', 'yXirSfe', 'fq7dKKU'];
+        var parent = document.getElementById('chartimages');
+        for (var i = imageIDs.length - 1; i >= 0; i--) {
+            var child = document.getElementById(imageIDs[i]);
+            if (child) {
+                parent.removeChild(child);
+            }
+        }
     }
 }
