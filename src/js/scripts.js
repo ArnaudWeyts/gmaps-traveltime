@@ -333,8 +333,27 @@ var actionS,
 
             imageModule.removeSampleImages();
         });
+
+        // jquery dynamic event handler to handle all the deletebuttons
+        $(document).on('click', '.delete-btn', function(e) {
+            e.preventDefault();
+            // get the node to be deleted
+            var imageNode = $(this).parent();
+
+            // delete the node using the parent
+            imageNode.remove();
+
+            // delete from the imgur album
+            if ($(this).attr('id') !== '') {
+                imageModule.deleteFromAlbum($(this).attr('id'), imageS.albumHash);
+            }
+        });
     },
 
+    /**
+    * Deprecated function
+    * @returns {void}
+    */
     updateUIActions: function() {
         actionS.deleteButton = $('.delete-btn');
         actionS.deleteButton.click(function(e) {
@@ -594,23 +613,19 @@ var chartS,
                     fill: false,
                     backgroundColor: "#43A047",
                     borderColor: "#43A047",
-                    pointBorderColor: "#43A047",
                     pointBackgroundColor: "#fff",
                     pointHoverBackgroundColor: "#43A047",
-                    pointHoverBorderColor: "#43A047",
-                    pointHoverBorderWidth: 5,
+                    pointHoverBorderWidth: 4,
                     data: []
                 },
                 {
                     label: "Your travel time",
                     fill: false,
-                    backgroundColor: "#3367D6",
-                    borderColor: "#3367D6",
-                    pointBorderColor: "#3367D6",
+                    backgroundColor: "#2196F3",
+                    borderColor: "#2196F3",
                     pointBackgroundColor: "#fff",
-                    pointHoverBackgroundColor: "#3367D6",
-                    pointHoverBorderColor: "#3367D6",
-                    pointHoverBorderWidth: 5,
+                    pointHoverBackgroundColor: "#2196F3",
+                    pointHoverBorderWidth: 4,
                     data: []
                 }
             ]
@@ -629,30 +644,18 @@ var chartS,
                         scaleLabel: {
                             display: true,
                             labelString: 'Date & Time DD/MM HH:MM',
-                            fontFamily: 'Roboto',
-                            fontStyle: 'bold'
-
                         },
-                        ticks: {
-                            fontFamily: 'Roboto'
-                        }
                     }],
                     yAxes: [{
                         scaleLabel: {
                             display: true,
                             labelString: 'Duration (min)',
-                            fontFamily: 'Roboto',
-                            fontStyle: 'bold'
                         },
-                        ticks: {
-                            fontFamily: 'Roboto'
-                        }
                     }],
                 },
                 tooltips: {
                     mode: 'label',
-                    fontFamily: 'Roboto',
-                    backgroundColor: 'rgba(42,42,42,1)'
+                    backgroundColor: 'rgba(0,0,0,1)'
                 },
                 animation: {
                     onProgress: function() {
@@ -667,7 +670,7 @@ var chartS,
     },
 
     /**
-    * Function to add a data pair to the graph
+    * Function to add data to the graph
     * @param {number} data1 google's estimate
     * @param {number} data2 the user's input
     * @param {string} label date
@@ -895,9 +898,6 @@ var imageS,
         div.appendChild(openImage);
         div.appendChild(deleteImage);
         parent.appendChild(div);
-
-        // update the buttons
-        actionModule.updateUIActions();
     },
 
     /**
@@ -929,7 +929,6 @@ var imageS,
             div.appendChild(deleteImage);
             parent.appendChild(div);
         })
-        actionModule.updateUIActions();
     },
 
     displaySampleImages: function() {
@@ -958,7 +957,6 @@ var imageS,
             div.appendChild(deleteImage);
             parent.appendChild(div);
         })
-        actionModule.updateUIActions();
     },
 
     removeSampleImages: function() {
