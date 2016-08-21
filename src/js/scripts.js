@@ -908,7 +908,6 @@ var imageS,
     displayAllImages: function(images) {
         var parent = document.getElementById('chartimages');
         images.forEach(function(entry) {
-            window.console.log(entry);
             var div = document.createElement('div');
             div.className = 'image-container'
             var title = document.createElement('h2');
@@ -937,7 +936,6 @@ var imageS,
         var images = this.getAllImages(imageIDs);
         var parent = document.getElementById('chartimages');
         images.forEach(function(entry) {
-            window.console.log(entry);
             var div = document.createElement('div');
             div.className = 'image-container'
             div.id = entry.id;
