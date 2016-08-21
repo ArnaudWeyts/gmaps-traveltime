@@ -884,11 +884,11 @@ var imageS,
         title.textContent = image.title;
         div.appendChild(title);
         var img = document.createElement('img');
-        img.src = image.link;
+        img.src = image.link.replace(/^http:/, 'https:');
         img.className = 'chart-img';
         div.appendChild(img);
         var openImage = document.createElement('a');
-        openImage.href = image.link;
+        openImage.href = image.link.replace(/^http:/, 'https:');
         openImage.className = 'material-btn gallery-btn';
         openImage.textContent = "Download";
         var deleteImage = document.createElement('a');
@@ -908,17 +908,18 @@ var imageS,
     displayAllImages: function(images) {
         var parent = document.getElementById('chartimages');
         images.forEach(function(entry) {
+            window.console.log(entry);
             var div = document.createElement('div');
             div.className = 'image-container'
             var title = document.createElement('h2');
             title.textContent = entry.title;
             div.appendChild(title);
             var img = document.createElement('img');
-            img.src = entry.link;
+            img.src = entry.link.replace(/^http:/, 'https:');
             img.className = 'chart-img';
             div.appendChild(img);
             var openImage = document.createElement('a');
-            openImage.href = entry.link;
+            openImage.href = entry.link.replace(/^http:/, 'https:');
             openImage.className = 'material-btn gallery-btn';
             openImage.textContent = "Download";
             var deleteImage = document.createElement('a');
@@ -936,6 +937,7 @@ var imageS,
         var images = this.getAllImages(imageIDs);
         var parent = document.getElementById('chartimages');
         images.forEach(function(entry) {
+            window.console.log(entry);
             var div = document.createElement('div');
             div.className = 'image-container'
             div.id = entry.id;
@@ -943,11 +945,11 @@ var imageS,
             title.textContent = entry.title;
             div.appendChild(title);
             var img = document.createElement('img');
-            img.src = entry.link;
+            img.src = entry.link.replace(/^http:/, 'https:');
             img.className = 'chart-img';
             div.appendChild(img);
             var openImage = document.createElement('a');
-            openImage.href = entry.link;
+            openImage.href = entry.link.replace(/^http:/, 'https:');
             openImage.className = 'material-btn gallery-btn';
             openImage.textContent = "Download";
             var deleteImage = document.createElement('a');
